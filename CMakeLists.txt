@@ -4,4 +4,4 @@ project(VES)
 
 file(GLOB SOURCE ${PROJECT_SOURCE_DIR}/${PROJECT_NAME}/*.cpp)
 
-add_executable(VES VES ${SOURCE})
+add_executable(VES exec ${SOURCE})
