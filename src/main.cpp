@@ -16,28 +16,29 @@ struct VESContext {
 };
 
 void UpdateCamera(VESContext& ctx) {
+    auto& camera = ctx.camera;
+
     ctx.cam_forward = Vector3{static_cast<float>(std::sin(ctx.cam_rotation.x)), static_cast<float>(std::tan(ctx.cam_rotation.y)), static_cast<float>(std::sin(M_PI_2 - ctx.cam_rotation.x))};
 
     if (IsKeyDown(KEY_W)) {
-        ctx.camera.position = Vector3{ctx.camera.position.x + (ctx.cam_forward.x * ctx.move_speed), ctx.camera.position.y + (ctx.cam_forward.y * ctx.move_speed), ctx.camera.position.z + (ctx.cam_forward.z * ctx.move_speed)};
+        camera.position = Vector3{camera.position.x + (ctx.cam_forward.x * ctx.move_speed), camera.position.y + (ctx.cam_forward.y * ctx.move_speed), camera.position.z + (ctx.cam_forward.z * ctx.move_speed)};
     } else if (IsKeyDown(KEY_S)) {
-        ctx.camera.position = Vector3{ctx.camera.position.x - (ctx.cam_forward.x * ctx.move_speed), ctx.camera.position.y - (ctx.cam_forward.y * ctx.move_speed), ctx.camera.position.z - (ctx.cam_forward.z * ctx.move_speed)};
+        camera.position = Vector3{camera.position.x - (ctx.cam_forward.x * ctx.move_speed), camera.position.y - (ctx.cam_forward.y * ctx.move_speed), camera.position.z - (ctx.cam_forward.z * ctx.move_speed)};
     }
     if (IsKeyDown(KEY_A)) {
-        ctx.camera.position = Vector3{ctx.camera.position.x + (ctx.cam_left.x * ctx.move_speed), ctx.camera.position.y + (ctx.cam_left.y * ctx.move_speed), ctx.camera.position.z + (ctx.cam_left.z * ctx.move_speed)};
+        camera.position = Vector3{camera.position.x + (ctx.cam_left.x * ctx.move_speed), camera.position.y + (ctx.cam_left.y * ctx.move_speed), camera.position.z + (ctx.cam_left.z * ctx.move_speed)};
     } else if (IsKeyDown(KEY_D)) {
-        ctx.camera.position = Vector3{ctx.camera.position.x - (ctx.cam_left.x * ctx.move_speed), ctx.camera.position.y - (ctx.cam_left.y * ctx.move_speed), ctx.camera.position.z - (ctx.cam_left.z * ctx.move_speed)};
+        camera.position = Vector3{camera.position.x - (ctx.cam_left.x * ctx.move_speed), camera.position.y - (ctx.cam_left.y * ctx.move_speed), camera.position.z - (ctx.cam_left.z * ctx.move_speed)};
     }
 
-    ctx.camera.target = Vector3{ctx.camera.position.x + ctx.cam_forward.x, ctx.camera.position.y + ctx.cam_forward.y, ctx.camera.position.z + ctx.cam_forward.z};
+    camera.target = Vector3{camera.position.x + ctx.cam_forward.x, camera.position.y + ctx.cam_forward.y, camera.position.z + ctx.cam_forward.z};
 
-    Vector2 mouse_delta = GetMouseDelta();
+    auto mouse_delta = GetMouseDelta();
     ctx.cam_rotation.x += ((-mouse_delta.x / ctx.screen_dim.x) / (2 * M_PI)) * ctx.mouse_sense;
     ctx.cam_rotation.y += ((-mouse_delta.y / ctx.screen_dim.y) / (2 * M_PI)) * ctx.mouse_sense;
+    ctx.cam_left = Vector3CrossProduct(camera.up, ctx.cam_forward);
 
-    ctx.cam_left = Vector3CrossProduct(ctx.camera.up, ctx.cam_forward);
-
-    UpdateCamera(&ctx.camera);
+    UpdateCamera(&camera);
 }
 
 int main(void) {
