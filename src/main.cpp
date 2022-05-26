@@ -2,6 +2,7 @@
 #include "raymath.h"
 #include <cmath>
 #include <fmt/format.h>
+#include <entt/entt.hpp>
 
 // Note to self: do not mix anything raylib with winapi (-> no global asio headers either :(.)
 
@@ -10,27 +11,37 @@ struct VESContext {
     Vector3 cam_rotation = {0.0f, 0.0f, 0.0f};
     Vector3 cam_forward = {0.0f, 0.0f, 0.0f};
     Vector3 cam_left = {0.0f, 0.0f, 0.0f};
+    Vector3 cam_position = {0.0f, 0.0f, 0.0f};
+    float cam_zoom = 1.0f;
     Camera3D camera = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f, CAMERA_PERSPECTIVE};
     float mouse_sense = 5.0f;
     float move_speed = 0.5f;
+    float zoom_speed = 0.1f;
 };
 
 void UpdateCamera(VESContext& ctx) {
     auto& camera = ctx.camera;
 
-    ctx.cam_forward = Vector3{static_cast<float>(std::sin(ctx.cam_rotation.x)), static_cast<float>(std::tan(ctx.cam_rotation.y)), static_cast<float>(std::sin(M_PI_2 - ctx.cam_rotation.x))};
+    ctx.cam_forward = Vector3{static_cast<float>(std::sin(ctx.cam_rotation.x)), static_cast<float>(std::sin(ctx.cam_rotation.y)), static_cast<float>(std::sin(M_PI_2 - ctx.cam_rotation.x))};
+
+    if (IsKeyDown(KEY_Q)) {
+        ctx.cam_zoom -= ctx.zoom_speed;
+    } else if (IsKeyDown(KEY_E)) {
+        ctx.cam_zoom += ctx.zoom_speed;
+    }
 
     if (IsKeyDown(KEY_W)) {
-        camera.position = Vector3{camera.position.x + (ctx.cam_forward.x * ctx.move_speed), camera.position.y + (ctx.cam_forward.y * ctx.move_speed), camera.position.z + (ctx.cam_forward.z * ctx.move_speed)};
+        ctx.cam_position = Vector3{ctx.cam_position.x + (ctx.cam_forward.x * ctx.move_speed), ctx.cam_position.y + (ctx.cam_forward.y * ctx.move_speed), ctx.cam_position.z + (ctx.cam_forward.z * ctx.move_speed)};
     } else if (IsKeyDown(KEY_S)) {
-        camera.position = Vector3{camera.position.x - (ctx.cam_forward.x * ctx.move_speed), camera.position.y - (ctx.cam_forward.y * ctx.move_speed), camera.position.z - (ctx.cam_forward.z * ctx.move_speed)};
+        ctx.cam_position = Vector3{ctx.cam_position.x - (ctx.cam_forward.x * ctx.move_speed), ctx.cam_position.y - (ctx.cam_forward.y * ctx.move_speed), ctx.cam_position.z - (ctx.cam_forward.z * ctx.move_speed)};
     }
     if (IsKeyDown(KEY_A)) {
-        camera.position = Vector3{camera.position.x + (ctx.cam_left.x * ctx.move_speed), camera.position.y + (ctx.cam_left.y * ctx.move_speed), camera.position.z + (ctx.cam_left.z * ctx.move_speed)};
+        ctx.cam_position = Vector3{ctx.cam_position.x + (ctx.cam_left.x * ctx.move_speed), ctx.cam_position.y + (ctx.cam_left.y * ctx.move_speed), ctx.cam_position.z + (ctx.cam_left.z * ctx.move_speed)};
     } else if (IsKeyDown(KEY_D)) {
-        camera.position = Vector3{camera.position.x - (ctx.cam_left.x * ctx.move_speed), camera.position.y - (ctx.cam_left.y * ctx.move_speed), camera.position.z - (ctx.cam_left.z * ctx.move_speed)};
+        ctx.cam_position = Vector3{ctx.cam_position.x - (ctx.cam_left.x * ctx.move_speed), ctx.cam_position.y - (ctx.cam_left.y * ctx.move_speed), ctx.cam_position.z - (ctx.cam_left.z * ctx.move_speed)};
     }
 
+    camera.position = Vector3{ctx.cam_position.x * ctx.cam_zoom, ctx.cam_position.y * ctx.cam_zoom, ctx.cam_position.z * ctx.cam_zoom};
     camera.target = Vector3{camera.position.x + ctx.cam_forward.x, camera.position.y + ctx.cam_forward.y, camera.position.z + ctx.cam_forward.z};
 
     auto mouse_delta = GetMouseDelta();
