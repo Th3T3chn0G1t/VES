@@ -17,8 +17,9 @@ set(raylib_USE_STATIC_LIBS ON)
 find_package(raylib CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(asio CONFIG REQUIRED)
+find_package(EnTT CONFIG REQUIRED)
 
-target_link_libraries(${PROJECT_NAME} fmt::fmt asio::asio raylib)
+target_link_libraries(${PROJECT_NAME} fmt::fmt asio::asio EnTT::EnTT raylib)
 target_compile_definitions(${PROJECT_NAME} PRIVATE _USE_MATH_DEFINES)
 
 if (WIN32)
