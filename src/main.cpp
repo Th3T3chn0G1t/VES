@@ -56,23 +56,30 @@ void UpdateCamera(VESContext& ctx) {
         ctx.cam_zoom += ctx.zoom_speed;
     }
 
-    if (IsKeyDown(KEY_W)) {
-        camera.target.x += ctx.move_speed;
-    } else if (IsKeyDown(KEY_S)) {
-        camera.target.x -= ctx.move_speed;
-    }
-    if (IsKeyDown(KEY_A)) {
-        camera.target.z += ctx.move_speed;
-    } else if (IsKeyDown(KEY_D)) {
-        camera.target.z -= ctx.move_speed;
-    }
-
-    camera.position = Vector3{camera.target.x + (std::sin(ctx.cam_rotation.x) * ctx.cam_zoom), ctx.cam_position.y + (std::sin(ctx.cam_rotation.y) * ctx.cam_zoom), camera.target.z + (std::cos(ctx.cam_rotation.x) * ctx.cam_zoom)};
-
     auto mouse_delta = GetMouseDelta();
     ctx.cam_rotation.x += ((-mouse_delta.x / ctx.screen_dim.x) / (2 * M_PI)) * ctx.mouse_sense;
     ctx.cam_rotation.y += ((-mouse_delta.y / ctx.screen_dim.y) / (2 * M_PI)) * ctx.mouse_sense;
     ctx.cam_left = Vector3CrossProduct(camera.up, ctx.cam_forward);
+
+    Vector2 planar_vec_to_cam = Vector2{std::sin(ctx.cam_rotation.x), std::cos(ctx.cam_rotation.x)};
+    Vector2 planar_left = Vector2{std::sin(static_cast<float>(ctx.cam_rotation.x + M_PI_2)), std::cos(static_cast<float>(ctx.cam_rotation.x + M_PI_2))};
+
+    if (IsKeyDown(KEY_W)) {
+        camera.target.x -= planar_vec_to_cam.x * ctx.move_speed;
+        camera.target.z -= planar_vec_to_cam.y * ctx.move_speed;
+    } else if (IsKeyDown(KEY_S)) {
+        camera.target.x += planar_vec_to_cam.x * ctx.move_speed;
+        camera.target.z += planar_vec_to_cam.y * ctx.move_speed;
+    }
+    if (IsKeyDown(KEY_A)) {
+        camera.target.x -= planar_left.x * ctx.move_speed;
+        camera.target.z -= planar_left.y * ctx.move_speed;
+    } else if (IsKeyDown(KEY_D)) {
+        camera.target.x += planar_left.x * ctx.move_speed;
+        camera.target.z += planar_left.y * ctx.move_speed;
+    }
+
+    camera.position = Vector3{camera.target.x + (planar_vec_to_cam.x * ctx.cam_zoom), ctx.cam_position.y + (std::sin(ctx.cam_rotation.y) * ctx.cam_zoom), camera.target.z + (planar_vec_to_cam.y * ctx.cam_zoom)};
 #endif
 
     UpdateCamera(&camera);
