@@ -2,6 +2,6 @@ cmake_minimum_required(VERSION 3.21)
 
 project(VES)
 
-file(GLOB SOURCE ${PROJECT_SOURCE_DIR}/${PROJECT_NAME}/*.cpp)
+file(GLOB_RECURSE SRC_FILES VES/*.cpp VES/*.hpp)
 
-add_executable(VES exec ${SOURCE})
+add_executable(VES ${SRC_FILES})
