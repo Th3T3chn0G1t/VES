@@ -5,7 +5,7 @@ ColumnLimit: 0
 NamespaceIndentation: All
 PointerAlignment: Left
 AlwaysBreakTemplateDeclarations: Yes
-PackConstructorInitializers: Never
+#PackConstructorInitializers: Never
 
 IndentExternBlock: Indent
 FixNamespaceComments: false
