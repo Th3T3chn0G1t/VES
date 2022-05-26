@@ -48,3 +48,5 @@ test.c
 
 CMakeFiles
 build
+
+.cache
