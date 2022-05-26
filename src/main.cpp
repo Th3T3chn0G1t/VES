@@ -44,7 +44,6 @@ int main(void) {
     VESContext vesCtx{};
     InitWindow(vesCtx.screen_dim.x, vesCtx.screen_dim.y, "VES");
     SetTargetFPS(60);
-
     SetCameraMode(vesCtx.camera, CAMERA_CUSTOM);
     DisableCursor();
 
