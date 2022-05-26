@@ -11,7 +11,7 @@ struct VESContext {
     Vector3 cam_rotation = {0.0f, 0.0f, 0.0f};
     Vector3 cam_forward = {0.0f, 0.0f, 0.0f};
     Vector3 cam_left = {0.0f, 0.0f, 0.0f};
-    Vector3 cam_position = {0.0f, 0.0f, 0.0f};
+    Vector3 cam_position = {0.0f, 10.0f, 0.0f};
     float cam_zoom = 1.0f;
     Camera3D camera = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f, CAMERA_PERSPECTIVE};
     float mouse_sense = 5.0f;
@@ -23,6 +23,7 @@ void UpdateCamera(VESContext& ctx) {
     auto& camera = ctx.camera;
 
     ctx.cam_forward = Vector3{static_cast<float>(std::sin(ctx.cam_rotation.x)), static_cast<float>(std::sin(ctx.cam_rotation.y)), static_cast<float>(std::sin(M_PI_2 - ctx.cam_rotation.x))};
+#ifdef VES_DO_FLYCAM
 
     if (IsKeyDown(KEY_Q)) {
         ctx.cam_zoom -= ctx.zoom_speed;
@@ -48,6 +49,31 @@ void UpdateCamera(VESContext& ctx) {
     ctx.cam_rotation.x += ((-mouse_delta.x / ctx.screen_dim.x) / (2 * M_PI)) * ctx.mouse_sense;
     ctx.cam_rotation.y += ((-mouse_delta.y / ctx.screen_dim.y) / (2 * M_PI)) * ctx.mouse_sense;
     ctx.cam_left = Vector3CrossProduct(camera.up, ctx.cam_forward);
+#else
+    if (IsKeyDown(KEY_Q)) {
+        ctx.cam_zoom -= ctx.zoom_speed;
+    } else if (IsKeyDown(KEY_E)) {
+        ctx.cam_zoom += ctx.zoom_speed;
+    }
+
+    if (IsKeyDown(KEY_W)) {
+        camera.target.x += ctx.move_speed;
+    } else if (IsKeyDown(KEY_S)) {
+        camera.target.x -= ctx.move_speed;
+    }
+    if (IsKeyDown(KEY_A)) {
+        camera.target.z += ctx.move_speed;
+    } else if (IsKeyDown(KEY_D)) {
+        camera.target.z -= ctx.move_speed;
+    }
+
+    camera.position = Vector3{camera.target.x + (std::sin(ctx.cam_rotation.x) * ctx.cam_zoom), ctx.cam_position.y + (std::sin(ctx.cam_rotation.y) * ctx.cam_zoom), camera.target.z + (std::cos(ctx.cam_rotation.x) * ctx.cam_zoom)};
+
+    auto mouse_delta = GetMouseDelta();
+    ctx.cam_rotation.x += ((-mouse_delta.x / ctx.screen_dim.x) / (2 * M_PI)) * ctx.mouse_sense;
+    ctx.cam_rotation.y += ((-mouse_delta.y / ctx.screen_dim.y) / (2 * M_PI)) * ctx.mouse_sense;
+    ctx.cam_left = Vector3CrossProduct(camera.up, ctx.cam_forward);
+#endif
 
     UpdateCamera(&camera);
 }
@@ -66,6 +92,7 @@ int main(void) {
             ClearBackground(BLACK);
             BeginMode3D(vesCtx.camera);
             {
+                DrawCube(Vector3{0.0f, -1.5f, 0.0f}, 100.0f, 1.0f, 100.0f, GRAY);
                 DrawCube(Vector3{10.0f, 0.0f, 0.0f}, 2.0f, 2.0f, 2.0f, RED);
                 DrawCube(Vector3{0.0f, 0.0f, -10.0f}, 2.0f, 2.0f, 2.0f, BLUE);
                 DrawCube(Vector3{0.0f, 0.0f, 10.0f}, 2.0f, 2.0f, 2.0f, GREEN);
