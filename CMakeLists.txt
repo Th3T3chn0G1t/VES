@@ -1,21 +1,27 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.18.1)
+cmake_policy(SET CMP0091 NEW)
+cmake_policy(SET CMP0111 NEW)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED true)
+include(vcpkg.cmake)
 
 project(VES)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-file(GLOB_RECURSE SRC_FILES ${PROJECT_NAME}/*.cpp ${PROJECT_NAME}/*.hpp)
-
+file(GLOB_RECURSE SRC_FILES src/*.cpp src/*.hpp src/*.c src/*.h)
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
-if(DEFINED VCPKG_ROOT)
-    set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "" FORCE)
-elseif(DEFINED ENV{VCPKG_ROOT})
-    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "" FORCE)
-else()
-    message(FATAL_ERROR "Please set VCPKG_ROOT (environment or cmake) to your vcpkg installation")
-endif()
+set(raylib_USE_STATIC_LIBS ON)
+find_package(raylib CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
+find_package(asio CONFIG REQUIRED)
 
-find_package(raylib 3.0 REQUIRED)
-target_link_libraries(${PROJECT_NAME} raylib)
+target_link_libraries(${PROJECT_NAME} fmt::fmt asio::asio raylib)
+target_compile_definitions(${PROJECT_NAME} PRIVATE _USE_MATH_DEFINES)
+
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME} winmm)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0601 _CRT_SECURE_NO_WARNINGS NOMINMAX WIN32_LEAN_AND_MEAN VC_EXTRALEAN)
+endif ()
+
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)

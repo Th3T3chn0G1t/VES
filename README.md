@@ -1,4 +1,0 @@
-# VES
-### VES RTS
-
-uwu

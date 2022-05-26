@@ -1,6 +1,9 @@
 #include "raylib.h"
 #include "raymath.h"
 #include <cmath>
+#include <fmt/format.h>
+
+// Note to self: do not mix anything raylib with winapi (-> no global asio headers either :(.)
 
 int main(void) {
     float mouse_sense = 5.0f;
