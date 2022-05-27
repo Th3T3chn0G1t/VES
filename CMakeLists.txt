@@ -10,8 +10,6 @@ include(vcpkg.cmake)
 
 project(VES)
 
-add_include_directories("vendor")
-
 file(GLOB_RECURSE SRC_FILES vendor/*.cpp vendor/*.hpp vendor/*.c vendor/*.h src/*.cpp src/*.hpp src/*.c src/*.h)
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
