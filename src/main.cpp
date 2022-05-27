@@ -1,6 +1,8 @@
 #include "include/components.hpp"
 #include "include/ves.hpp"
 
+#include <iostream>
+
 // Note to self: do not mix anything raylib with winapi (-> no global asio headers either :(.)
 
 void UpdateWorld(VESContext& ctx, float delta) {
@@ -23,9 +25,18 @@ int main(void) {
     SetTargetFPS(60);
     SetCameraMode(ctx.camera, CAMERA_CUSTOM);
 
-    entt::entity floor = ctx.world.create();
-    ctx.world.emplace<TransformComponent>(floor, Vector3{0.0f, -1.5f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{100.0f, 1.0f, 100.0f});
-    ctx.world.emplace<BoxComponent>(floor, GRAY);
+    TransformComponent terrain_transform = {{-50.0f, 0.0f, -50.0f}, {0.0f, 0.0f, 0.0f}, {100.0f, 20.0f, 100.0f}};
+    Image terrain_image = LoadImage("res/texture/heightmap.png");
+    Texture2D terrain_texture = LoadTextureFromImage(terrain_image);
+
+    Mesh terrain_mesh = GenMeshHeightmap(terrain_image, Vector3{1.0f, 1.0f, 1.0f});
+    Model terrain_model = LoadModelFromMesh(terrain_mesh);
+
+    terrain_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = terrain_texture;
+    
+    entt::entity terrain = ctx.world.create();
+    ctx.world.emplace<TransformComponent>(terrain, terrain_transform);
+    ctx.world.emplace<RenderableComponent>(terrain, &terrain_model);
 
     Model teapot = LoadModel("res/model/teapot.obj");
 
@@ -44,6 +55,12 @@ int main(void) {
 
     while (!WindowShouldClose()) {
         float delta = GetFrameTime();
+        
+        uint32_t current_cell = static_cast<uint32_t>(((ctx.camera.target.x  - terrain_transform.translation.x)/ terrain_transform.scale.x) * terrain_image.width) + terrain_image.width * static_cast<uint32_t>(((ctx.camera.target.z - terrain_transform.translation.z) / terrain_transform.scale.z) * terrain_image.height);
+        if (current_cell < terrain_image.width * terrain_image.height) {
+            ctx.camera.target.y = terrain_transform.translation.y + (static_cast<uint8_t*>(terrain_image.data)[current_cell * GetPixelDataSize(1, 1, terrain_image.format)] / 255.0f) * terrain_transform.scale.y;
+        }
+
         UpdateCamera(ctx, delta);
         UpdateWorld(ctx, delta);
         BeginDrawing();
@@ -52,6 +69,7 @@ int main(void) {
             BeginMode3D(ctx.camera);
             {
                 DrawWorld(ctx, delta);
+                DrawCube(ctx.camera.target, 1.0f, 1.0f, 1.0f, RED);
             }
             EndMode3D();
         }
