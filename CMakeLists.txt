@@ -18,8 +18,11 @@ find_package(raylib CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(asio CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
+find_package(sol2 CONFIG REQUIRED)
+find_path(LUAJIT_INCLUDE_DIR luajit.h PATH_SUFFIXES luajit luajit-2.0)
+find_library(LUAJIT_LIBRARY NAMES lua51 luajit-5.1)
 
-target_link_libraries(${PROJECT_NAME} fmt::fmt asio::asio EnTT::EnTT raylib)
+target_link_libraries(${PROJECT_NAME} fmt::fmt asio::asio EnTT::EnTT sol2::sol2 raylib ${LUAJIT_LIBRARY})
 target_compile_definitions(${PROJECT_NAME} PRIVATE _USE_MATH_DEFINES)
 
 if (WIN32)
