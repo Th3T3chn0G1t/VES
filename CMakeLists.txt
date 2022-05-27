@@ -24,7 +24,7 @@ find_path(LUAJIT_INCLUDE_DIR luajit.h PATH_SUFFIXES luajit luajit-2.0 luajit-2.1
 find_library(LUAJIT_LIBRARY NAMES lua51 luajit-5.1)
 
 target_link_libraries(${PROJECT_NAME} fmt::fmt asio::asio imgui::imgui EnTT::EnTT sol2::sol2 raylib ${LUAJIT_LIBRARY})
-target_compile_definitions(${PROJECT_NAME} PRIVATE _USE_MATH_DEFINES SOL_LUAJIT)
+target_compile_definitions(${PROJECT_NAME} PRIVATE _USE_MATH_DEFINES SOL_LUAJIT SOL_ALL_SAFETIES_ON)
 
 if (WIN32)
     target_link_libraries(${PROJECT_NAME} winmm)
