@@ -3,10 +3,11 @@
 using namespace VES;
 
 static void limit(float& val, float dest, float diff) {
-    if (val < dest - diff)
+    if (val < dest - diff) {
         val += diff;
-    else if (val > dest + diff)
+    } else if (val > dest + diff) {
         val -= diff;
+    }
 }
 
 void Context::UpdateCamera(float delta) {
@@ -28,16 +29,17 @@ void Context::UpdateCamera(float delta) {
         if (rot.x < 0)
             rot.x += M_PI * 2;
     }
-    if (IsKeyDown(KEY_UP) && rot.y - camera.turn_speed * delta > 0)
+
+    if (IsKeyDown(KEY_UP) && rot.y - camera.turn_speed * delta > 0) {
         rot.y -= camera.turn_speed * delta;
-    else if (IsKeyDown(KEY_DOWN) && rot.y + camera.turn_speed * delta < M_PI_2)
+    } else if (IsKeyDown(KEY_DOWN) && rot.y + camera.turn_speed * delta < M_PI_2) {
         rot.y += camera.turn_speed * delta;
+    }
 
     camera.cam_left = Vector3CrossProduct(camera.camera.up, camera.cam_forward);
 
     Vector2 planar_vec_to_cam = Vector2{std::sin(rot.x), std::cos(rot.x)};
     Vector2 planar_left = Vector2{std::sin(static_cast<float>(rot.x + M_PI_2)), std::cos(static_cast<float>(rot.x + M_PI_2))};
-
     Vector3 &target = camera.camera.target, &target_dest = camera.cam_target_destination, &target_interpspeed = camera.cam_target_destination_interp_speed;
 
     if (IsKeyDown(KEY_W)) {

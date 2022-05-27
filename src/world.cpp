@@ -10,7 +10,6 @@ float Context::HeightAtPlanarWorldPos(Vector2 planar_world) {
     uint32_t cell_x = (translated_x / terrain_transform.scale.x) * terrain.heightmap.width;
     uint32_t cell_z = (translated_z / terrain_transform.scale.z) * terrain.heightmap.height;
     uint32_t cell_idx = cell_x + cell_z * terrain.heightmap.width;
-
     if (cell_idx < terrain.heightmap.width * terrain.heightmap.height) {
         auto height_u8 = static_cast<uint8_t*>(terrain.heightmap.data)[cell_idx * GetPixelDataSize(1, 1, terrain.heightmap.format)];
         return terrain_transform.translation.y + (height_u8 / 255.0f) * terrain_transform.scale.y;
@@ -27,10 +26,10 @@ void Context::UpdateWorld(float delta) {
 
     this->world.view<VES::Component::LuaBehavior>().each([](entt::entity entity, VES::Component::LuaBehavior& behavior) {
         if (auto f = behavior.callbacks.find("update"); f != behavior.callbacks.end()) {
-            sol::protected_function_result r =  f->second(entity);
-            if(!r.valid()) {
+            sol::protected_function_result r = f->second(entity);
+            if (!r.valid()) {
                 sol::error e = r;
-                fmt::print("{}", e.what());
+                fmt::print(stderr, "{}", e.what());
                 exit(1);
             }
         }

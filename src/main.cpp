@@ -3,7 +3,7 @@
 // Note to self: do not mix anything raylib with winapi (-> no global asio headers either :(.)
 
 static int lua_exception_handler(lua_State* state, sol::optional<const std::exception&> exception, std::string_view message) {
-    fmt::print("Lua Exception: {}", message);
+    fmt::print(stderr, "Lua Exception: {}", message);
 
     return 0;
 }
@@ -52,40 +52,31 @@ int main(int argc, const char** argv) {
     ctx.world.emplace<VES::Component::Transform>(a, Vector3{10.0f, 0.0f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
     ctx.world.emplace<VES::Component::Renderable>(a, &teapot, RED);
     ctx.world.emplace<VES::Component::SurfaceObject>(a);
-    ctx.world.emplace<VES::Component::Behavior>(a, VES::Component::Behavior::CallbackMap{
-        {
-            "update", [](VES::Context& ctx, entt::entity entity) {
-                VES::Component::Transform& transform = ctx.world.get<VES::Component::Transform>(entity);
-                transform.translation.x += (GetRandomValue(0, 255) / 255.0f) - 0.5f;
-                transform.translation.z += (GetRandomValue(0, 255) / 255.0f) - 0.5f;
-            }
-        }
-    });
+    ctx.world.emplace<VES::Component::Behavior>(a,
+        VES::Component::Behavior::CallbackMap{
+            {"update", [](VES::Context& ctx, entt::entity entity) {
+                 VES::Component::Transform& transform = ctx.world.get<VES::Component::Transform>(entity);
+                 transform.translation.x += (GetRandomValue(0, 255) / 255.0f) - 0.5f;
+                 transform.translation.z += (GetRandomValue(0, 255) / 255.0f) - 0.5f;
+             }}});
 
     entt::entity b = ctx.world.create();
     ctx.world.emplace<VES::Component::Transform>(b, Vector3{-10.0f, 0.0f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
     ctx.world.emplace<VES::Component::Renderable>(b, &teapot, GREEN);
     ctx.world.emplace<VES::Component::SurfaceObject>(b);
-    ctx.world.emplace<VES::Component::Behavior>(b, VES::Component::Behavior::CallbackMap{
-        {
-            "update", [](VES::Context& ctx, entt::entity entity) {
-                VES::Component::Transform& transform = ctx.world.get<VES::Component::Transform>(entity);
-                transform.translation.x += (ctx.camera.camera.target.x - transform.translation.x) * 0.1f;
-                transform.translation.z += (ctx.camera.camera.target.z - transform.translation.z) * 0.1f;
-            }
-        }
-    });
+    ctx.world.emplace<VES::Component::Behavior>(b,
+        VES::Component::Behavior::CallbackMap{
+            {"update", [](VES::Context& ctx, entt::entity entity) {
+                 VES::Component::Transform& transform = ctx.world.get<VES::Component::Transform>(entity);
+                 transform.translation.x += (ctx.camera.camera.target.x - transform.translation.x) * 0.1f;
+                 transform.translation.z += (ctx.camera.camera.target.z - transform.translation.z) * 0.1f;
+             }}});
 
     entt::entity c = ctx.world.create();
     ctx.world.emplace<VES::Component::Transform>(c, Vector3{0.0f, 0.0f, 10.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
     ctx.world.emplace<VES::Component::Renderable>(c, &teapot, BLUE);
     ctx.world.emplace<VES::Component::SurfaceObject>(c);
-    sol::protected_function f = ctx.lua["update"];
-    ctx.world.emplace<VES::Component::LuaBehavior>(c, VES::Component::LuaBehavior::CallbackMap{
-        {
-            "update", f
-        }
-    });
+    ctx.world.emplace<VES::Component::LuaBehavior>(c, VES::Component::LuaBehavior::CallbackMap{{"update", ctx.lua["update"]}});
 
     entt::entity d = ctx.world.create();
     ctx.world.emplace<VES::Component::Transform>(d, Vector3{0.0f, 0.0f, -10.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
@@ -94,9 +85,7 @@ int main(int argc, const char** argv) {
 
     while (!WindowShouldClose()) {
         float delta = GetFrameTime();
-
         ctx.camera.cam_target_destination.y = ctx.HeightAtPlanarWorldPos(Vector2{ctx.camera.camera.target.x, ctx.camera.camera.target.z});
-
         ctx.UpdateCamera(delta);
         ctx.UpdateWorld(delta);
         BeginDrawing();
