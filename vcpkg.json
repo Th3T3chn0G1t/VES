@@ -9,6 +9,7 @@
     "asio",
     "entt",
     "sol2",
-    "luajit"
+    "luajit",
+    "imgui"
   ]
 }

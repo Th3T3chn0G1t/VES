@@ -20,7 +20,6 @@ float Context::HeightAtPlanarWorldPos(Vector2 planar_world) {
 }
 
 void Context::UpdateWorld(float delta) {
-
 }
 
 void Context::DrawWorld(float delta) {
@@ -32,4 +31,3 @@ void Context::DrawWorld(float delta) {
         }
     });
 }
-

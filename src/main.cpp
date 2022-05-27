@@ -9,11 +9,11 @@ int main(int argc, const char** argv) {
     if (argc > 1) {
         ctx.datafod = argv[1];
     } else {
-        if(!std::filesystem::is_directory(ctx.datafod)) {
+        if (!std::filesystem::is_directory(ctx.datafod)) {
             ctx.datafod = "../res";
         }
     }
-    
+
     if (!std::filesystem::is_directory(ctx.datafod)) {
         fmt::print("Missing resfolder!");
         std::abort();
@@ -58,7 +58,7 @@ int main(int argc, const char** argv) {
     while (!WindowShouldClose()) {
         float delta = GetFrameTime();
 
-        ctx.camera.cam_target_destination.y = ctx.HeightAtPlanarWorldPos(Vector2{ ctx.camera.camera.target.x,  ctx.camera.camera.target.z});
+        ctx.camera.cam_target_destination.y = ctx.HeightAtPlanarWorldPos(Vector2{ctx.camera.camera.target.x, ctx.camera.camera.target.z});
 
         ctx.UpdateCamera(delta);
         ctx.UpdateWorld(delta);

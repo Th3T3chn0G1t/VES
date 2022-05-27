@@ -51,4 +51,3 @@ namespace VES {
         float HeightAtPlanarWorldPos(Vector2 planar_world);
     };
 }
-
