@@ -26,6 +26,7 @@ int main(int argc, const char** argv) {
 
     ctx.lua.open_libraries(sol::lib::base, sol::lib::package);
     ctx.lua.set_exception_handler(lua_exception_handler);
+    ctx.RegisterLuaNatives();
     ctx.lua.load_file(fmt::format("{}/script/test.lua", ctx.datafod.string()))();
 
     InitWindow(ctx.screen_dim.x, ctx.screen_dim.y, "VES");
@@ -79,7 +80,7 @@ int main(int argc, const char** argv) {
     ctx.world.emplace<VES::Component::Transform>(c, Vector3{0.0f, 0.0f, 10.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
     ctx.world.emplace<VES::Component::Renderable>(c, &teapot, BLUE);
     ctx.world.emplace<VES::Component::SurfaceObject>(c);
-    sol::function f = ctx.lua["update"];
+    sol::protected_function f = ctx.lua["update"];
     ctx.world.emplace<VES::Component::LuaBehavior>(c, VES::Component::LuaBehavior::CallbackMap{
         {
             "update", f

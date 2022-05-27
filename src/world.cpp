@@ -25,10 +25,14 @@ void Context::UpdateWorld(float delta) {
         }
     });
 
-    this->world.view<VES::Component::LuaBehavior>().each([this](entt::entity entity, VES::Component::LuaBehavior& behavior) {
+    this->world.view<VES::Component::LuaBehavior>().each([](entt::entity entity, VES::Component::LuaBehavior& behavior) {
         if (auto f = behavior.callbacks.find("update"); f != behavior.callbacks.end()) {
-            // f->second(*this, entity);
-            f->second();
+            sol::protected_function_result r =  f->second(entity);
+            if(!r.valid()) {
+                sol::error e = r;
+                fmt::print("{}", e.what());
+                exit(1);
+            }
         }
     });
 }
