@@ -47,6 +47,14 @@ void UpdateCamera(VESContext& ctx, float delta) {
         camera.target.z += planar_left.y * ctx.move_speed * delta;
     }
 
+
+    if (camera.target.x < ctx.cam_target_destination.x - ctx.cam_target_speed.x) camera.target.x += ctx.cam_target_speed.x;
+    else if (camera.target.x > ctx.cam_target_destination.x + ctx.cam_target_speed.x) camera.target.x -= ctx.cam_target_speed.x;
+    if (camera.target.y < ctx.cam_target_destination.y - ctx.cam_target_speed.y) camera.target.y += ctx.cam_target_speed.y;
+    else if (camera.target.y > ctx.cam_target_destination.y + ctx.cam_target_speed.y) camera.target.y -= ctx.cam_target_speed.y;
+    if (camera.target.z < ctx.cam_target_destination.z - ctx.cam_target_speed.z) camera.target.z += ctx.cam_target_speed.z;
+    else if (camera.target.z > ctx.cam_target_destination.z + ctx.cam_target_speed.z) camera.target.z -= ctx.cam_target_speed.z;
+
     camera.position = Vector3{camera.target.x + (planar_vec_to_cam.x * ctx.cam_zoom), ctx.cam_position.y + (std::sin(ctx.cam_rotation.y) * ctx.cam_zoom), camera.target.z + (planar_vec_to_cam.y * ctx.cam_zoom)};
 
     UpdateCamera(&camera);
