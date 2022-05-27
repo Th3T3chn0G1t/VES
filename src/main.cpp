@@ -6,7 +6,16 @@
 int main(int argc, const char** argv) {
     VES::Context ctx{};
 
-    if(argc > 1) ctx.datafod = argv[1];
+    if (argc > 1) {
+        ctx.datafod = argv[1];
+    } else {
+        auto isCwd = std::filesystem::is_directory(ctx.datafod);
+        ctx.datafod = "../res";
+        if (!std::filesystem::is_directory(ctx.datafod)) {
+            fmt::print("Missing resfolder!");
+            std::abort();
+        }
+    }
 
     InitWindow(ctx.screen_dim.x, ctx.screen_dim.y, "VES");
     SetTargetFPS(60);

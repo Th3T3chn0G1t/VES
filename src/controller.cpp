@@ -41,6 +41,7 @@ void Context::UpdateCamera(float delta) {
         camera.target.x += planar_vec_to_cam.x * this->move_speed * delta;
         camera.target.z += planar_vec_to_cam.y * this->move_speed * delta;
     }
+
     if (IsKeyDown(KEY_A)) {
         camera.target.x -= planar_left.x * this->move_speed * delta;
         camera.target.z -= planar_left.y * this->move_speed * delta;
@@ -49,13 +50,23 @@ void Context::UpdateCamera(float delta) {
         camera.target.z += planar_left.y * this->move_speed * delta;
     }
 
+    if (camera.target.x < ctx.cam_target_destination.x - ctx.cam_target_speed.x) {
+        camera.target.x += ctx.cam_target_speed.x;
+    } else if (camera.target.x > ctx.cam_target_destination.x + ctx.cam_target_speed.x) {
+        camera.target.x -= ctx.cam_target_speed.x;
+    }
 
-    if (camera.target.x < this->cam_target_destination.x - this->cam_target_speed.x) camera.target.x += this->cam_target_speed.x;
-    else if (camera.target.x > this->cam_target_destination.x + this->cam_target_speed.x) camera.target.x -= this->cam_target_speed.x;
-    if (camera.target.y < this->cam_target_destination.y - this->cam_target_speed.y) camera.target.y += this->cam_target_speed.y;
-    else if (camera.target.y > this->cam_target_destination.y + this->cam_target_speed.y) camera.target.y -= this->cam_target_speed.y;
-    if (camera.target.z < this->cam_target_destination.z - this->cam_target_speed.z) camera.target.z += this->cam_target_speed.z;
-    else if (camera.target.z > this->cam_target_destination.z + this->cam_target_speed.z) camera.target.z -= this->cam_target_speed.z;
+    if (camera.target.y < ctx.cam_target_destination.y - ctx.cam_target_speed.y) {
+        camera.target.y += ctx.cam_target_speed.y;
+    } else if (camera.target.y > ctx.cam_target_destination.y + ctx.cam_target_speed.y) {
+        camera.target.y -= ctx.cam_target_speed.y;
+    }
+
+    if (camera.target.z < ctx.cam_target_destination.z - ctx.cam_target_speed.z) {
+        camera.target.z += ctx.cam_target_speed.z;
+    } else if (camera.target.z > ctx.cam_target_destination.z + ctx.cam_target_speed.z) {
+        camera.target.z -= ctx.cam_target_speed.z;
+    }
 
     camera.position = Vector3{camera.target.x + (planar_vec_to_cam.x * this->cam_zoom), std::max(this->HeightAtPlanarWorldPos(Vector2{this->camera.position.x, this->camera.position.z}) + cam_min_height, this->cam_position.y + (std::sin(this->cam_rotation.y) * this->cam_zoom)), camera.target.z + (planar_vec_to_cam.y * this->cam_zoom)};
 
