@@ -1,3 +1,3 @@
-function update(ctx, entity)
+function update()
     print("Tick!")
 end

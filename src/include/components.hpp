@@ -27,7 +27,7 @@ namespace VES {
         };
 
         struct LuaBehavior {
-            using Functor = sol::function;
+            using Functor = sol::function&;
             using CallbackMap = std::unordered_map<std::string, Functor>;
 
             CallbackMap callbacks;

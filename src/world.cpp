@@ -27,7 +27,8 @@ void Context::UpdateWorld(float delta) {
 
     this->world.view<VES::Component::LuaBehavior>().each([this](entt::entity entity, VES::Component::LuaBehavior& behavior) {
         if (auto f = behavior.callbacks.find("update"); f != behavior.callbacks.end()) {
-            f->second(*this, entity);
+            // f->second(*this, entity);
+            f->second();
         }
     });
 }
