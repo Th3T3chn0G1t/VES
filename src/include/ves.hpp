@@ -3,7 +3,6 @@
 #include <raylib.h>
 #include <raymath.h>
 #include <rlgl.h>
-#include <rlights.h>
 
 #include <fmt/format.h>
 

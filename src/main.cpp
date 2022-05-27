@@ -23,38 +23,29 @@ int main(void) {
     SetTargetFPS(60);
     SetCameraMode(ctx.camera, CAMERA_CUSTOM);
 
-    Shader shader = LoadShader("res/shader/base_lighting.vs", "resources/shader/lighting.fs");
-    shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shader, "viewPos");
-    int ambientLoc = GetShaderLocation(shader, "ambient");
-    SetShaderValue(shader, ambientLoc, (float[4]){0.1f, 0.1f, 0.1f, 1.0f}, SHADER_UNIFORM_VEC4);
-    Light lights[] = {CreateLight(LIGHT_POINT, (Vector3){-2, 1, -2}, Vector3Zero(), YELLOW, shader), CreateLight(LIGHT_POINT, (Vector3){2, 1, 2}, Vector3Zero(), RED, shader), CreateLight(LIGHT_POINT, (Vector3){-2, 1, 2}, Vector3Zero(), GREEN, shader), CreateLight(LIGHT_POINT, (Vector3){2, 1, -2}, Vector3Zero(), BLUE, shader)};
-
     entt::entity floor = ctx.world.create();
     ctx.world.emplace<TransformComponent>(floor, Vector3{0.0f, -1.5f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{100.0f, 1.0f, 100.0f});
     ctx.world.emplace<BoxComponent>(floor, GRAY);
 
     Model teapot = LoadModel("res/model/teapot.obj");
-    teapot.materials[0].shader = shader;
 
     entt::entity a = ctx.world.create();
     ctx.world.emplace<TransformComponent>(a, Vector3{10.0f, 0.0f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{2.0f, 2.0f, 2.0f});
-    ctx.world.emplace<RenderableComponent>(a, &teapot);
+    ctx.world.emplace<RenderableComponent>(a, &teapot, RED);
     entt::entity b = ctx.world.create();
     ctx.world.emplace<TransformComponent>(b, Vector3{-10.0f, 0.0f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{2.0f, 2.0f, 2.0f});
-    ctx.world.emplace<RenderableComponent>(b, &teapot);
+    ctx.world.emplace<RenderableComponent>(b, &teapot, GREEN);
     entt::entity c = ctx.world.create();
     ctx.world.emplace<TransformComponent>(c, Vector3{0.0f, 0.0f, 10.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{2.0f, 2.0f, 2.0f});
-    ctx.world.emplace<RenderableComponent>(c, &teapot);
+    ctx.world.emplace<RenderableComponent>(c, &teapot, BLUE);
     entt::entity d = ctx.world.create();
     ctx.world.emplace<TransformComponent>(d, Vector3{0.0f, 0.0f, -10.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{2.0f, 2.0f, 2.0f});
-    ctx.world.emplace<RenderableComponent>(d, &teapot);
+    ctx.world.emplace<RenderableComponent>(d, &teapot, YELLOW);
 
     while (!WindowShouldClose()) {
         float delta = GetFrameTime();
         UpdateCamera(ctx, delta);
         UpdateWorld(ctx, delta);
-        for(size_t i = 0; i < sizeof(lights) / sizeof(lights[0]); ++i) UpdateLightValues(shader, lights[i]);
-        SetShaderValue(shader, shader.locs[SHADER_LOC_VECTOR_VIEW], (float*) &ctx.camera.position, SHADER_UNIFORM_VEC3);
         BeginDrawing();
         {
             ClearBackground(BLACK);
