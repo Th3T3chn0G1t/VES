@@ -24,11 +24,11 @@ find_path(LUAJIT_INCLUDE_DIR luajit.h PATH_SUFFIXES luajit luajit-2.0)
 find_library(LUAJIT_LIBRARY NAMES lua51 luajit-5.1)
 
 target_link_libraries(${PROJECT_NAME} fmt::fmt asio::asio imgui::imgui EnTT::EnTT sol2::sol2 raylib ${LUAJIT_LIBRARY})
-target_compile_definitions(${PROJECT_NAME} PRIVATE _USE_MATH_DEFINES)
+target_compile_definitions(${PROJECT_NAME} PRIVATE _USE_MATH_DEFINES SOL_LUAJIT)
 
 if (WIN32)
     target_link_libraries(${PROJECT_NAME} winmm)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0601 _CRT_SECURE_NO_WARNINGS NOMINMAX WIN32_LEAN_AND_MEAN VC_EXTRALEAN)
 endif ()
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${LUAJIT_INCLUDE_DIR})
