@@ -10,14 +10,12 @@ namespace VES {
         Vector3 scale = {1.0f, 1.0f, 1.0f};
     };
 
-    struct BoxComponent {
-        Color color;
-    };
-
     struct RenderableComponent {
         Model* model;
         Color tint = WHITE;
     };
+
+    struct SurfaceObjectComponent {};
 
     struct TerrainComponent {
         Image heightmap;

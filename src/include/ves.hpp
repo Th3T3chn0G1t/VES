@@ -19,10 +19,7 @@ namespace VES {
         entt::entity terrain;
     };
 
-    struct Context {
-        std::filesystem::path datafod = "res";
-        Vector2 screen_dim = {1280, 720};
-
+    struct Camera {
         Vector3 cam_rotation = {0.0f, M_PI_2, 0.0f};
         Vector3 cam_forward = {0.0f, 0.0f, 0.0f};
         Vector3 cam_left = {0.0f, 0.0f, 0.0f};
@@ -38,7 +35,13 @@ namespace VES {
         Vector3 cam_target_speed = {0.0f, 0.1f, 0.0f};
 
         Vector2 zoom_limits = {1.0f, 100.0f};
+    };
 
+    struct Context {
+        std::filesystem::path datafod = "res";
+        Vector2 screen_dim = {1280, 720};
+
+        Camera camera;
         Map* map;
         entt::registry world;
 

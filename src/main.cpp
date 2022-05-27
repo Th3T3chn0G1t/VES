@@ -21,7 +21,7 @@ int main(int argc, const char** argv) {
 
     InitWindow(ctx.screen_dim.x, ctx.screen_dim.y, "VES");
     SetTargetFPS(60);
-    SetCameraMode(ctx.camera, CAMERA_CUSTOM);
+    SetCameraMode(ctx.camera.camera, CAMERA_CUSTOM);
 
     Image terrain_image = LoadImage(fmt::format("{}/texture/heightmap.png", ctx.datafod.string()).c_str());
     Texture2D terrain_texture = LoadTextureFromImage(terrain_image);
@@ -41,30 +41,34 @@ int main(int argc, const char** argv) {
     entt::entity a = ctx.world.create();
     ctx.world.emplace<VES::TransformComponent>(a, Vector3{10.0f, 0.0f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{2.0f, 2.0f, 2.0f});
     ctx.world.emplace<VES::RenderableComponent>(a, &teapot, RED);
+    ctx.world.emplace<VES::SurfaceObjectComponent>(a);
     entt::entity b = ctx.world.create();
     ctx.world.emplace<VES::TransformComponent>(b, Vector3{-10.0f, 0.0f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{2.0f, 2.0f, 2.0f});
     ctx.world.emplace<VES::RenderableComponent>(b, &teapot, GREEN);
+    ctx.world.emplace<VES::SurfaceObjectComponent>(b);
     entt::entity c = ctx.world.create();
     ctx.world.emplace<VES::TransformComponent>(c, Vector3{0.0f, 0.0f, 10.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{2.0f, 2.0f, 2.0f});
     ctx.world.emplace<VES::RenderableComponent>(c, &teapot, BLUE);
+    ctx.world.emplace<VES::SurfaceObjectComponent>(c);
     entt::entity d = ctx.world.create();
     ctx.world.emplace<VES::TransformComponent>(d, Vector3{0.0f, 0.0f, -10.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{2.0f, 2.0f, 2.0f});
     ctx.world.emplace<VES::RenderableComponent>(d, &teapot, YELLOW);
+    ctx.world.emplace<VES::SurfaceObjectComponent>(d);
 
     while (!WindowShouldClose()) {
         float delta = GetFrameTime();
 
-        ctx.cam_target_destination.y = ctx.HeightAtPlanarWorldPos(Vector2{ ctx.camera.target.x,  ctx.camera.target.z});
+        ctx.camera.cam_target_destination.y = ctx.HeightAtPlanarWorldPos(Vector2{ ctx.camera.camera.target.x,  ctx.camera.camera.target.z});
 
         ctx.UpdateCamera(delta);
         ctx.UpdateWorld(delta);
         BeginDrawing();
         {
             ClearBackground(BLACK);
-            BeginMode3D(ctx.camera);
+            BeginMode3D(ctx.camera.camera);
             {
                 ctx.DrawWorld(delta);
-                DrawCube(Vector3{ctx.camera.target.x, ctx.cam_target_destination.y, ctx.camera.target.z}, 1.0f, 1.0f, 1.0f, RED);
+                DrawCube(Vector3{ctx.camera.camera.target.x, ctx.camera.cam_target_destination.y, ctx.camera.camera.target.z}, 1.0f, 1.0f, 1.0f, RED);
             }
             EndMode3D();
         }

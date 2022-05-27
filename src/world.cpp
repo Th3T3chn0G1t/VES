@@ -24,12 +24,12 @@ void Context::UpdateWorld(float delta) {
 }
 
 void Context::DrawWorld(float delta) {
-    this->world.view<VES::TransformComponent, VES::BoxComponent>().each([](VES::TransformComponent transform, VES::BoxComponent box) {
-        DrawCube(transform.translation, transform.scale.x, transform.scale.y, transform.scale.z, box.color);
-    });
-
-    this->world.view<VES::TransformComponent, VES::RenderableComponent>().each([](VES::TransformComponent transform, VES::RenderableComponent renderable) {
-        DrawModelEx(*renderable.model, transform.translation, Vector3{1.0f, 0.0f, 0.0f}, transform.rotation.x, transform.scale, renderable.tint);
+    this->world.view<VES::TransformComponent, VES::RenderableComponent>().each([this](entt::entity entity, VES::TransformComponent transform, VES::RenderableComponent renderable) {
+        if (this->world.all_of<SurfaceObjectComponent>(entity)) {
+            DrawModelEx(*renderable.model, Vector3{transform.translation.x, this->HeightAtPlanarWorldPos(Vector2{transform.translation.x, transform.translation.z}) + transform.translation.y, transform.translation.z}, Vector3{1.0f, 0.0f, 0.0f}, transform.rotation.x, transform.scale, renderable.tint);
+        } else {
+            DrawModelEx(*renderable.model, transform.translation, Vector3{1.0f, 0.0f, 0.0f}, transform.rotation.x, transform.scale, renderable.tint);
+        }
     });
 }
 
