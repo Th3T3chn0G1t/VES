@@ -26,8 +26,8 @@ void Context::Dispatch(std::string signal, float delta) {
 
     this->world.view<VES::Component::LuaBehavior>().each([&signal, delta](entt::entity entity, VES::Component::LuaBehavior& behavior) {
         if (auto f = behavior.callbacks.find(signal); f != behavior.callbacks.end()) {
-            sol::protected_function_result r =  f->second(entity, delta);
-            if(!r.valid()) {
+            sol::protected_function_result r = f->second(entity, delta);
+            if (!r.valid()) {
                 sol::error e = r;
                 fmt::print(stderr, "{}", e.what());
                 exit(1);
