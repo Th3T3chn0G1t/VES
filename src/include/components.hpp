@@ -20,19 +20,23 @@ namespace VES {
         };
 
         struct Behavior {
-            using Functor = std::function<void(Context&, entt::entity)>;
+            using Functor = std::function<void(Context&, entt::entity, float)>;
             using CallbackMap = std::unordered_map<std::string, Functor>;
 
             CallbackMap callbacks;
         };
 
         struct LuaBehavior {
-            using Functor = sol::protected_function&;
+            using Functor = sol::protected_function;
             using CallbackMap = std::unordered_map<std::string, Functor>;
 
             CallbackMap callbacks;
         };
 
-        struct Selectable {};
+        struct Name {
+            std::string name;
+        };
+
+        struct UnboundedVerticalBlock {};
     }
 }

@@ -15,6 +15,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <functional>
+#include <memory>
 #include <cmath>
 
 namespace VES {
@@ -49,11 +50,12 @@ namespace VES {
         Camera camera;
         Map* map;
         entt::registry world;
+        std::unordered_map<std::string, entt::entity> scene;
 
         sol::state lua;
 
         void UpdateCamera(float delta);
-        void UpdateWorld(float delta);
+        void Dispatch(std::string signal, float delta);
         void DrawWorld(float delta);
         float HeightAtPlanarWorldPos(Vector2 planar_world);
         void RegisterLuaNatives();

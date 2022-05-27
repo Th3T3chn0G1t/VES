@@ -1,6 +1,6 @@
-function update(entity)
-    amt = {x = 0.1, y = 0.1}
+function update(entity, delta)
+    amt = {x = 1.0 * delta, y = 1.0 * delta}
     ves.planar_move(entity, amt)
 end
 
--- register("update", move_line, "bob")
+ves.register("update", update, "c")

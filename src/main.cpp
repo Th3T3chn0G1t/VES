@@ -27,7 +27,7 @@ int main(int argc, const char** argv) {
     ctx.lua.open_libraries(sol::lib::base, sol::lib::package);
     ctx.lua.set_exception_handler(lua_exception_handler);
     ctx.RegisterLuaNatives();
-    ctx.lua.load_file(fmt::format("{}/script/test.lua", ctx.datafod.string()))();
+    sol::load_result script_file = ctx.lua.load_file(fmt::format("{}/script/test.lua", ctx.datafod.string()));
 
     InitWindow(ctx.screen_dim.x, ctx.screen_dim.y, "VES");
     SetTargetFPS(60);
@@ -40,54 +40,75 @@ int main(int argc, const char** argv) {
     terrain_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = terrain_texture;
 
     entt::entity terrain = ctx.world.create();
+    ctx.scene["terrain"] = terrain;
+    ctx.world.emplace<VES::Component::Name>(terrain, "terrain");
     ctx.world.emplace<VES::Component::Transform>(terrain, Vector3{-50.0f, 0.0f, -50.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{100.0f, 20.0f, 100.0f});
     ctx.world.emplace<VES::Component::Terrain>(terrain, terrain_image);
     ctx.world.emplace<VES::Component::Renderable>(terrain, &terrain_model);
+    ctx.world.emplace<VES::Component::LuaBehavior>(terrain);
     VES::Map map{terrain};
     ctx.map = &map;
 
     Model teapot = LoadModel(fmt::format("{}/model/teapot.obj", ctx.datafod.string()).c_str());
 
     entt::entity a = ctx.world.create();
+    ctx.scene["a"] = a;
+    ctx.world.emplace<VES::Component::Name>(a, "a");
     ctx.world.emplace<VES::Component::Transform>(a, Vector3{10.0f, 0.0f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
     ctx.world.emplace<VES::Component::Renderable>(a, &teapot, RED);
     ctx.world.emplace<VES::Component::SurfaceObject>(a);
-    ctx.world.emplace<VES::Component::Behavior>(a,
-        VES::Component::Behavior::CallbackMap{
-            {"update", [](VES::Context& ctx, entt::entity entity) {
-                 VES::Component::Transform& transform = ctx.world.get<VES::Component::Transform>(entity);
-                 transform.translation.x += (GetRandomValue(0, 255) / 255.0f) - 0.5f;
-                 transform.translation.z += (GetRandomValue(0, 255) / 255.0f) - 0.5f;
-             }}});
+    ctx.world.emplace<VES::Component::Behavior>(a, VES::Component::Behavior::CallbackMap{
+        {
+            "update", [](VES::Context& ctx, entt::entity entity, float delta) {
+                VES::Component::Transform& transform = ctx.world.get<VES::Component::Transform>(entity);
+                transform.translation.x += (GetRandomValue(0, 255) / 255.0f) - 0.5f;
+                transform.translation.z += (GetRandomValue(0, 255) / 255.0f) - 0.5f;
+            }
+        }
+    });
+    ctx.world.emplace<VES::Component::LuaBehavior>(a);
 
     entt::entity b = ctx.world.create();
+    ctx.scene["b"] = b;
+    ctx.world.emplace<VES::Component::Name>(b, "b");
     ctx.world.emplace<VES::Component::Transform>(b, Vector3{-10.0f, 0.0f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
     ctx.world.emplace<VES::Component::Renderable>(b, &teapot, GREEN);
     ctx.world.emplace<VES::Component::SurfaceObject>(b);
-    ctx.world.emplace<VES::Component::Behavior>(b,
-        VES::Component::Behavior::CallbackMap{
-            {"update", [](VES::Context& ctx, entt::entity entity) {
-                 VES::Component::Transform& transform = ctx.world.get<VES::Component::Transform>(entity);
-                 transform.translation.x += (ctx.camera.camera.target.x - transform.translation.x) * 0.1f;
-                 transform.translation.z += (ctx.camera.camera.target.z - transform.translation.z) * 0.1f;
-             }}});
+    ctx.world.emplace<VES::Component::Behavior>(b, VES::Component::Behavior::CallbackMap{
+        {
+            "update", [](VES::Context& ctx, entt::entity entity, float delta) {
+                VES::Component::Transform& transform = ctx.world.get<VES::Component::Transform>(entity);
+                transform.translation.x += (ctx.camera.camera.target.x - transform.translation.x) * 0.1f * delta;
+                transform.translation.z += (ctx.camera.camera.target.z - transform.translation.z) * 0.1f * delta;
+            }
+        }
+    });
+    ctx.world.emplace<VES::Component::LuaBehavior>(b);
 
     entt::entity c = ctx.world.create();
+    ctx.scene["c"] = c;
+    ctx.world.emplace<VES::Component::Name>(c, "c");
     ctx.world.emplace<VES::Component::Transform>(c, Vector3{0.0f, 0.0f, 10.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
     ctx.world.emplace<VES::Component::Renderable>(c, &teapot, BLUE);
     ctx.world.emplace<VES::Component::SurfaceObject>(c);
-    ctx.world.emplace<VES::Component::LuaBehavior>(c, VES::Component::LuaBehavior::CallbackMap{{"update", ctx.lua["update"]}});
+    ctx.world.emplace<VES::Component::LuaBehavior>(c);
 
     entt::entity d = ctx.world.create();
-    ctx.world.emplace<VES::Component::Transform>(d, Vector3{0.0f, 0.0f, -10.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
+    ctx.scene["d"] = d;
+    ctx.world.emplace<VES::Component::Name>(d, "d");
+    ctx.world.emplace<VES::Component::Transform>(d, Vector3{0.0f, 0.0f, -10.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{5.0f, 5.0f, 5.0f});
     ctx.world.emplace<VES::Component::Renderable>(d, &teapot, YELLOW);
     ctx.world.emplace<VES::Component::SurfaceObject>(d);
+    ctx.world.emplace<VES::Component::LuaBehavior>(d);
+    ctx.world.emplace<VES::Component::UnboundedVerticalBlock>(d);
+
+    script_file();
 
     while (!WindowShouldClose()) {
         float delta = GetFrameTime();
         ctx.camera.cam_target_destination.y = ctx.HeightAtPlanarWorldPos(Vector2{ctx.camera.camera.target.x, ctx.camera.camera.target.z});
         ctx.UpdateCamera(delta);
-        ctx.UpdateWorld(delta);
+        ctx.Dispatch("update", delta);
         BeginDrawing();
         {
             ClearBackground(BLACK);
@@ -102,5 +123,8 @@ int main(int argc, const char** argv) {
     }
 
     CloseWindow();
+
+    ctx.world.clear();
+
     return 0;
 }

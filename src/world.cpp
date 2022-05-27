@@ -17,17 +17,17 @@ float Context::HeightAtPlanarWorldPos(Vector2 planar_world) {
     return 0.0f;
 }
 
-void Context::UpdateWorld(float delta) {
-    this->world.view<VES::Component::Behavior>().each([this](entt::entity entity, VES::Component::Behavior& behavior) {
-        if (auto f = behavior.callbacks.find("update"); f != behavior.callbacks.end()) {
-            f->second(*this, entity);
+void Context::Dispatch(std::string signal, float delta) {
+    this->world.view<VES::Component::Behavior>().each([this, &signal, delta](entt::entity entity, VES::Component::Behavior& behavior) {
+        if (auto f = behavior.callbacks.find(signal); f != behavior.callbacks.end()) {
+            f->second(*this, entity, delta);
         }
     });
 
-    this->world.view<VES::Component::LuaBehavior>().each([](entt::entity entity, VES::Component::LuaBehavior& behavior) {
-        if (auto f = behavior.callbacks.find("update"); f != behavior.callbacks.end()) {
-            sol::protected_function_result r = f->second(entity);
-            if (!r.valid()) {
+    this->world.view<VES::Component::LuaBehavior>().each([&signal, delta](entt::entity entity, VES::Component::LuaBehavior& behavior) {
+        if (auto f = behavior.callbacks.find(signal); f != behavior.callbacks.end()) {
+            sol::protected_function_result r =  f->second(entity, delta);
+            if(!r.valid()) {
                 sol::error e = r;
                 fmt::print(stderr, "{}", e.what());
                 exit(1);
