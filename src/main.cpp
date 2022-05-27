@@ -18,15 +18,17 @@ void DrawWorld(VESContext& ctx, float delta) {
     });
 }
 
-int main(void) {
+int main(int argc, const char** argv) {
     VESContext ctx{};
+
+    if(argc > 1) ctx.datafod = argv[1];
 
     InitWindow(ctx.screen_dim.x, ctx.screen_dim.y, "VES");
     SetTargetFPS(60);
     SetCameraMode(ctx.camera, CAMERA_CUSTOM);
 
     TransformComponent terrain_transform = {{-50.0f, 0.0f, -50.0f}, {0.0f, 0.0f, 0.0f}, {100.0f, 20.0f, 100.0f}};
-    Image terrain_image = LoadImage("res/texture/heightmap.png");
+    Image terrain_image = LoadImage(fmt::format("{}/texture/heightmap.png", ctx.datafod.string()).c_str());
     Texture2D terrain_texture = LoadTextureFromImage(terrain_image);
 
     Mesh terrain_mesh = GenMeshHeightmap(terrain_image, Vector3{1.0f, 1.0f, 1.0f});
@@ -38,7 +40,7 @@ int main(void) {
     ctx.world.emplace<TransformComponent>(terrain, terrain_transform);
     ctx.world.emplace<RenderableComponent>(terrain, &terrain_model);
 
-    Model teapot = LoadModel("res/model/teapot.obj");
+    Model teapot = LoadModel(fmt::format("{}/model/teapot.obj", ctx.datafod.string()).c_str());
 
     entt::entity a = ctx.world.create();
     ctx.world.emplace<TransformComponent>(a, Vector3{10.0f, 0.0f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{2.0f, 2.0f, 2.0f});

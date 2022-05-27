@@ -14,6 +14,7 @@
 #include <cmath>
 
 struct VESContext {
+    std::filesystem::path datafod = "res";
     Vector2 screen_dim = {1280, 720};
 
     Vector3 cam_rotation = {0.0f, M_PI_2, 0.0f};
