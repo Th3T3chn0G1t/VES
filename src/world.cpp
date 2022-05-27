@@ -1,5 +1,4 @@
 #include "include/ves.hpp"
-#include "include/components.hpp"
 
 using namespace VES;
 
@@ -20,6 +19,11 @@ float Context::HeightAtPlanarWorldPos(Vector2 planar_world) {
 }
 
 void Context::UpdateWorld(float delta) {
+    this->world.view<VES::TransformComponent, VES::BehaviorComponent>().each([this](entt::entity entity, VES::TransformComponent& transform, VES::BehaviorComponent& behavior) {
+        Vector2 planar_movement = behavior.planar_movement(*this, entity);
+        transform.translation.x += planar_movement.x;
+        transform.translation.z += planar_movement.y;
+    });
 }
 
 void Context::DrawWorld(float delta) {
