@@ -1,27 +1,38 @@
 #pragma once
 
 namespace VES {
-    namespace Component {}
-    struct TransformComponent {
-        Vector3 translation = {0.0f, 0.0f, 0.0f};
-        Vector3 rotation = {0.0f, 0.0f, 0.0f};
-        Vector3 scale = {1.0f, 1.0f, 1.0f};
-    };
+    namespace Component {
+        struct Transform {
+            Vector3 translation = {0.0f, 0.0f, 0.0f};
+            Vector3 rotation = {0.0f, 0.0f, 0.0f};
+            Vector3 scale = {1.0f, 1.0f, 1.0f};
+        };
 
-    struct RenderableComponent {
-        Model* model;
-        Color tint = WHITE;
-    };
+        struct Renderable {
+            Model* model;
+            Color tint = WHITE;
+        };
 
-    struct SurfaceObjectComponent {};
+        struct SurfaceObject {};
 
-    struct TerrainComponent {
-        Image heightmap;
-    };
+        struct Terrain {
+            Image heightmap;
+        };
 
-    struct BehaviorComponent {
-        std::function<Vector2(Context&, entt::entity)> planar_movement;
-    };
+        struct Behavior {
+            using Functor = std::function<void(Context&, entt::entity)>;
+            using CallbackMap = std::unordered_map<std::string, Functor>;
 
-    struct Selectable {};
+            CallbackMap callbacks;
+        };
+
+        struct LuaBehavior {
+            using Functor = sol::function;
+            using CallbackMap = std::unordered_map<std::string, Functor>;
+
+            CallbackMap callbacks;
+        };
+
+        struct Selectable {};
+    }
 }
