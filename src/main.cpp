@@ -33,7 +33,7 @@ int main(void) {
     Model terrain_model = LoadModelFromMesh(terrain_mesh);
 
     terrain_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = terrain_texture;
-    
+
     entt::entity terrain = ctx.world.create();
     ctx.world.emplace<TransformComponent>(terrain, terrain_transform);
     ctx.world.emplace<RenderableComponent>(terrain, &terrain_model);
@@ -55,10 +55,16 @@ int main(void) {
 
     while (!WindowShouldClose()) {
         float delta = GetFrameTime();
-        
-        uint32_t current_cell = static_cast<uint32_t>(((ctx.camera.target.x  - terrain_transform.translation.x)/ terrain_transform.scale.x) * terrain_image.width) + terrain_image.width * static_cast<uint32_t>(((ctx.camera.target.z - terrain_transform.translation.z) / terrain_transform.scale.z) * terrain_image.height);
-        if (current_cell < terrain_image.width * terrain_image.height) {
-            ctx.cam_target_destination.y = terrain_transform.translation.y + (static_cast<uint8_t*>(terrain_image.data)[current_cell * GetPixelDataSize(1, 1, terrain_image.format)] / 255.0f) * terrain_transform.scale.y;
+
+        auto translated_x = ctx.camera.target.x - terrain_transform.translation.x;
+        auto translated_z = ctx.camera.target.z - terrain_transform.translation.z;
+        uint32_t cell_x = (translated_x / terrain_transform.scale.x) * terrain_image.width;
+        uint32_t cell_z = (translated_z / terrain_transform.scale.z) * terrain_image.height;
+        uint32_t cell_idx = cell_x + cell_z * terrain_image.width;
+
+        if (cell_idx < terrain_image.width * terrain_image.height) {
+            auto height_u8 = static_cast<uint8_t*>(terrain_image.data)[cell_idx * GetPixelDataSize(1, 1, terrain_image.format)];
+            ctx.cam_target_destination.y = terrain_transform.translation.y + (height_u8 / 255.0f) * terrain_transform.scale.y;
         }
 
         UpdateCamera(ctx, delta);
