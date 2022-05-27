@@ -57,8 +57,6 @@ namespace VES {
         void DrawWorld(float delta);
         float HeightAtPlanarWorldPos(Vector2 planar_world);
         void RegisterLuaNatives();
-
-        void PlanarMove(entt::entity entity, Vector2 amount);
     };
 }
 
