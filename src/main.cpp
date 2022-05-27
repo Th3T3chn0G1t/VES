@@ -93,7 +93,7 @@ int main(int argc, const char** argv) {
             entt::entity d = world.create();
             ctx.scene["d"] = d;
             world.emplace<VES::Component::Name>(d, "d");
-            world.emplace<VES::Component::Transform>(d, Vector3{0.0f, 0.0f, -10.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{5.0f, 5.0f, 5.0f});
+            world.emplace<VES::Component::Transform>(d, Vector3{20.0f, 0.0f, 20.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{5.0f, 5.0f, 5.0f});
             world.emplace<VES::Component::Renderable>(d, &teapot, YELLOW);
             world.emplace<VES::Component::SurfaceObject>(d);
             world.emplace<VES::Component::LuaBehavior>(d);

@@ -13,7 +13,9 @@ namespace VES {
             Color tint = WHITE;
         };
 
-        struct SurfaceObject {};
+        struct SurfaceObject {
+            char pad;
+        };
 
         struct Terrain {
             Image heightmap;
@@ -37,6 +39,8 @@ namespace VES {
             std::string name;
         };
 
-        struct UnboundedVerticalBlock {};
+        struct UnboundedVerticalBlock {
+            char pad;
+        };
     }
 }
