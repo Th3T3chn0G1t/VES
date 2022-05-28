@@ -50,7 +50,7 @@ void Context::Update(float delta) {
     UpdateCamera(delta);
 
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        world.view<Component::Transform, Component::Blockable, Component::Selectable, Component::LuaBehavior>().each([this, delta](entt::entity entity, Component::Transform& transform, Component::Blockable& blockable, Component::Selectable selectable, Component::LuaBehavior& behavior) {
+        world.view<Component::Transform, Component::Blockable, Component::Selectable, Component::LuaBehavior, Component::Name>().each([this, delta](entt::entity entity, Component::Transform& transform, Component::Blockable& blockable, Component::Selectable selectable, Component::LuaBehavior& behavior, Component::Name& name) {
             float height = HeightAtPlanarWorldPos(Vector2{transform.translation.x, transform.translation.y});
             BoundingBox real_bounds = BoundingBox{
                 {transform.translation.x + (blockable.bounds.min.x * transform.scale.x),
@@ -61,7 +61,16 @@ void Context::Update(float delta) {
                     transform.translation.z + (blockable.bounds.max.z * transform.scale.z)}};
 
             if (GetRayCollisionBox(GetMouseRay(GetMousePosition(), camera.camera), real_bounds).hit) {
-                behavior.callbacks["select"](entity, delta);
+                if (auto f = behavior.callbacks.find("select"); f != behavior.callbacks.end()) {
+                    sol::protected_function_result r = f->second(entity, delta);
+                    if (!r.valid()) {
+                        sol::error e = r;
+                        fmt::print(stderr, "{}", e.what());
+                        exit(1);
+                    }
+                }
+                camera.focus = &transform.translation;
+                camera.focused_name = &name.name;
             }
         });
     }

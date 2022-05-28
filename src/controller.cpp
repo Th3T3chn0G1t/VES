@@ -47,22 +47,34 @@ void Context::UpdateCamera(float delta) {
     if (IsKeyDown(KEY_W)) {
         target.x -= planar_vec_to_cam.x * camera.move_speed * delta;
         target.z -= planar_vec_to_cam.y * camera.move_speed * delta;
+        camera.focus = NULL;
+        camera.focused_name = NULL;
     } else if (IsKeyDown(KEY_S)) {
         target.x += planar_vec_to_cam.x * camera.move_speed * delta;
         target.z += planar_vec_to_cam.y * camera.move_speed * delta;
+        camera.focus = NULL;
+        camera.focused_name = NULL;
     }
 
     if (IsKeyDown(KEY_A)) {
         target.x -= planar_left.x * camera.move_speed * delta;
         target.z -= planar_left.y * camera.move_speed * delta;
+        camera.focus = NULL;
+        camera.focused_name = NULL;
     } else if (IsKeyDown(KEY_D)) {
         target.x += planar_left.x * camera.move_speed * delta;
         target.z += planar_left.y * camera.move_speed * delta;
+        camera.focus = NULL;
+        camera.focused_name = NULL;
     }
 
     limit(target.x, target_dest.x, target_interpspeed.x);
     limit(target.y, target_dest.y, target_interpspeed.y);
     limit(target.z, target_dest.z, target_interpspeed.z);
+
+    if (camera.focus) {
+        target = Vector3{camera.focus->x, target.y, camera.focus->z};
+    }
 
     float y = camera.position.y + (std::sin(rot.y) * camera.zoom);
     Vector3 &pos = camera.camera.position, &pos_dest = camera.position_destination,

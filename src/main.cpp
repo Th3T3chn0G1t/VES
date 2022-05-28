@@ -83,6 +83,8 @@ int main(int argc, const char** argv) {
                          transform.translation.z += (ctx.camera.camera.target.z - transform.translation.z) * 0.1f * delta;
                      }}});
             world.emplace<VES::Component::LuaBehavior>(b);
+            world.emplace<VES::Component::Blockable>(b, teapot);
+            world.emplace<VES::Component::Selectable>(b);
 
             entt::entity c = world.create();
             ctx.scene["c"] = c;
@@ -92,6 +94,7 @@ int main(int argc, const char** argv) {
             world.emplace<VES::Component::SurfaceObject>(c);
             world.emplace<VES::Component::LuaBehavior>(c);
             world.emplace<VES::Component::Blockable>(c, teapot);
+            world.emplace<VES::Component::Selectable>(c);
 
             entt::entity d = world.create();
             ctx.scene["d"] = d;
@@ -101,25 +104,29 @@ int main(int argc, const char** argv) {
             world.emplace<VES::Component::SurfaceObject>(d);
             world.emplace<VES::Component::LuaBehavior>(d);
             world.emplace<VES::Component::UnboundedVerticalBlock>(d, teapot);
+            world.emplace<VES::Component::Blockable>(d, teapot);
+            world.emplace<VES::Component::Selectable>(d);
         }
     }
 
     main_script.call();
 
-    Ray last{};
-
     while (!WindowShouldClose()) {
         ctx.Update(GetFrameTime());
         BeginDrawing();
         {
-
             ClearBackground(BLACK);
             BeginMode3D(ctx.camera.camera);
             {
                 ctx.DrawWorld();
                 DrawCube(Vector3{ctx.camera.camera.target.x, ctx.camera.target_destination.y, ctx.camera.camera.target.z}, 1.0f, 1.0f, 1.0f, RED);
+                if (ctx.camera.focus) {
+                    float height = ctx.HeightAtPlanarWorldPos(Vector2{ctx.camera.focus->x, ctx.camera.focus->y});
+                    DrawCircle3D(Vector3{ctx.camera.focus->x, height + ctx.camera.focus->y, ctx.camera.focus->z}, 2.5f, Vector3{1.0f, 0.0f, 0.0f}, 90.0f, RED);
+                }
             }
             EndMode3D();
+            DrawText(fmt::format("Selected: {}", ctx.camera.focused_name ? *ctx.camera.focused_name : "unnamed").c_str(), 10, 10, 20, RAYWHITE);
         }
         EndDrawing();
     }

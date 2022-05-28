@@ -41,6 +41,9 @@ namespace VES {
         Vector3 position_destination_interp_speed = {0.0f, 0.5f, 0.0f};
 
         Vector2 zoom_limits = {1.0f, 100.0f};
+
+        Vector3* focus = NULL;
+        std::string* focused_name = NULL;
     };
 
     struct Context {
