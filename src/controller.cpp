@@ -11,13 +11,15 @@ static void limit(float& val, float dest, float diff) {
 }
 
 void Context::UpdateCamera(float delta) {
-    Vector3& rot = camera.cam_rotation;
+    camera.target_destination.y = HeightAtPlanarWorldPos(Vector2{camera.camera.target.x, camera.camera.target.z});
 
-    camera.cam_forward = Vector3{static_cast<float>(std::sin(rot.x)), static_cast<float>(std::sin(rot.y)), static_cast<float>(std::sin(M_PI_2 - rot.x))};
-    if (IsKeyDown(KEY_Q) && camera.cam_zoom - camera.zoom_speed * delta < camera.zoom_limits.y) {
-        camera.cam_zoom += camera.zoom_speed * delta;
-    } else if (IsKeyDown(KEY_E) && camera.cam_zoom + camera.zoom_speed * delta > camera.zoom_limits.x) {
-        camera.cam_zoom -= camera.zoom_speed * delta;
+    Vector3& rot = camera.rotation;
+
+    camera.forward = Vector3{static_cast<float>(std::sin(rot.x)), static_cast<float>(std::sin(rot.y)), static_cast<float>(std::sin(M_PI_2 - rot.x))};
+    if (IsKeyDown(KEY_Q) && camera.zoom - camera.zoom_speed * delta < camera.zoom_limits.y) {
+        camera.zoom += camera.zoom_speed * delta;
+    } else if (IsKeyDown(KEY_E) && camera.zoom + camera.zoom_speed * delta > camera.zoom_limits.x) {
+        camera.zoom -= camera.zoom_speed * delta;
     }
 
     if (IsKeyDown(KEY_LEFT)) {
@@ -36,11 +38,11 @@ void Context::UpdateCamera(float delta) {
         rot.y += camera.turn_speed * delta;
     }
 
-    camera.cam_left = Vector3CrossProduct(camera.camera.up, camera.cam_forward);
+    camera.left = Vector3CrossProduct(camera.camera.up, camera.forward);
 
     Vector2 planar_vec_to_cam = Vector2{std::sin(rot.x), std::cos(rot.x)};
     Vector2 planar_left = Vector2{std::sin(static_cast<float>(rot.x + M_PI_2)), std::cos(static_cast<float>(rot.x + M_PI_2))};
-    Vector3 &target = camera.camera.target, &target_dest = camera.cam_target_destination, &target_interpspeed = camera.cam_target_destination_interp_speed;
+    Vector3 &target = camera.camera.target, &target_dest = camera.target_destination, &target_interpspeed = camera.target_destination_interp_speed;
 
     if (IsKeyDown(KEY_W)) {
         target.x -= planar_vec_to_cam.x * camera.move_speed * delta;
@@ -62,12 +64,12 @@ void Context::UpdateCamera(float delta) {
     limit(target.y, target_dest.y, target_interpspeed.y);
     limit(target.z, target_dest.z, target_interpspeed.z);
 
-    float y = camera.cam_position.y + (std::sin(rot.y) * camera.cam_zoom);
-    Vector3 &pos = camera.camera.position, &pos_dest = camera.cam_position_destination,
-            &pos_interpspeed = camera.cam_position_destination_interp_speed;
-    pos.x = target.x + (planar_vec_to_cam.x * camera.cam_zoom);
-    pos.y = std::max(HeightAtPlanarWorldPos(Vector2{pos.x, pos.z}) + camera.cam_min_height, y);
-    pos.z = target.z + (planar_vec_to_cam.y * camera.cam_zoom);
+    float y = camera.position.y + (std::sin(rot.y) * camera.zoom);
+    Vector3 &pos = camera.camera.position, &pos_dest = camera.position_destination,
+            &pos_interpspeed = camera.position_destination_interp_speed;
+    pos.x = target.x + (planar_vec_to_cam.x * camera.zoom);
+    pos.y = std::max(HeightAtPlanarWorldPos(Vector2{pos.x, pos.z}) + camera.min_height, y);
+    pos.z = target.z + (planar_vec_to_cam.y * camera.zoom);
 
     limit(pos.x, pos_dest.x, pos_interpspeed.x);
     limit(pos.y, pos_dest.y, pos_interpspeed.y);

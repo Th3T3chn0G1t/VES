@@ -10,7 +10,7 @@ namespace VES {
             transform.translation.z += float(amount["y"]);
 
             if (Component::Blockable* blockable = world.try_get<Component::Blockable>(entity)) {
-                world.view<Component::Transform, Component::UnboundedVerticalBlock, Component::Renderable>().each([this /*TODO: Emily remove*/, blockable, &transform, &amount](entt::entity entity, Component::Transform& other, Component::UnboundedVerticalBlock& block, Component::Renderable& renderable) {
+                world.view<Component::Transform, Component::UnboundedVerticalBlock, Component::Renderable>().each([blockable, &transform, &amount](entt::entity entity, Component::Transform& other, Component::UnboundedVerticalBlock& block, Component::Renderable& renderable) {
                     if (transform.translation.x + (blockable->bounds.max.x * transform.scale.x) > other.translation.x + (block.bounds.min.x * other.scale.x) && transform.translation.x + (blockable->bounds.min.x * transform.scale.x) < other.translation.x + (block.bounds.max.x * other.scale.x)) {
                         if (transform.translation.z + (blockable->bounds.max.z * transform.scale.z) > other.translation.z + (block.bounds.min.z * other.scale.z) && transform.translation.z + (blockable->bounds.min.z * transform.scale.z) < other.translation.z + (block.bounds.max.z * other.scale.z)) {
                             transform.translation.x -= float(amount["x"]);

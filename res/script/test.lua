@@ -3,4 +3,9 @@ function update(entity, delta)
     ves.planar_move(entity, amt)
 end
 
+function select(entity, delta)
+    print("Ayyy! " .. delta)
+end
+
 ves.register("update", update, "c")
+ves.register("select", select, "a")

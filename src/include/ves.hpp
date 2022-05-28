@@ -24,21 +24,21 @@ namespace VES {
     };
 
     struct Camera {
-        Vector3 cam_rotation = {0.0f, M_PI_2, 0.0f};
-        Vector3 cam_forward = {0.0f, 0.0f, 0.0f};
-        Vector3 cam_left = {0.0f, 0.0f, 0.0f};
-        Vector3 cam_position = {0.0f, 0.0f, 0.0f};
-        float cam_zoom = 40.0f;
-        Vector3 cam_target_destination = {0.0f, 0.0f, 0.0f};
-        Vector3 cam_position_destination = {0.0f, 0.0f, 0.0f};
+        Vector3 rotation = {0.0f, M_PI_2, 0.0f};
+        Vector3 forward = {0.0f, 0.0f, 0.0f};
+        Vector3 left = {0.0f, 0.0f, 0.0f};
+        Vector3 position = {0.0f, 0.0f, 0.0f};
+        float zoom = 40.0f;
+        Vector3 target_destination = {0.0f, 0.0f, 0.0f};
+        Vector3 position_destination = {0.0f, 0.0f, 0.0f};
         Camera3D camera = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f, CAMERA_PERSPECTIVE};
 
         float move_speed = 20.0f;
         float zoom_speed = 10.0f;
         float turn_speed = 5.0f;
-        float cam_min_height = 5.0f;
-        Vector3 cam_target_destination_interp_speed = {0.0f, 0.1f, 0.0f};
-        Vector3 cam_position_destination_interp_speed = {0.0f, 0.5f, 0.0f};
+        float min_height = 5.0f;
+        Vector3 target_destination_interp_speed = {0.0f, 0.1f, 0.0f};
+        Vector3 position_destination_interp_speed = {0.0f, 0.5f, 0.0f};
 
         Vector2 zoom_limits = {1.0f, 100.0f};
     };
@@ -54,9 +54,10 @@ namespace VES {
 
         sol::state lua;
 
+        void Update(float delta);
         void UpdateCamera(float delta);
         void Dispatch(std::string signal, float delta);
-        void DrawWorld(float delta);
+        void DrawWorld();
         float HeightAtPlanarWorldPos(Vector2 planar_world);
         void RegisterLuaNatives();
     };

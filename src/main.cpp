@@ -66,6 +66,8 @@ int main(int argc, const char** argv) {
                          transform.translation.z += (GetRandomValue(0, 255) / 255.0f) - 0.5f;
                      }}});
             world.emplace<VES::Component::LuaBehavior>(a);
+            world.emplace<VES::Component::Blockable>(a, teapot);
+            world.emplace<VES::Component::Selectable>(a);
 
             entt::entity b = world.create();
             ctx.scene["b"] = b;
@@ -104,18 +106,18 @@ int main(int argc, const char** argv) {
 
     main_script.call();
 
+    Ray last{};
+
     while (!WindowShouldClose()) {
-        float delta = GetFrameTime();
-        ctx.camera.cam_target_destination.y = ctx.HeightAtPlanarWorldPos(Vector2{ctx.camera.camera.target.x, ctx.camera.camera.target.z});
-        ctx.UpdateCamera(delta);
-        ctx.Dispatch("update", delta);
+        ctx.Update(GetFrameTime());
         BeginDrawing();
         {
+
             ClearBackground(BLACK);
             BeginMode3D(ctx.camera.camera);
             {
-                ctx.DrawWorld(delta);
-                DrawCube(Vector3{ctx.camera.camera.target.x, ctx.camera.cam_target_destination.y, ctx.camera.camera.target.z}, 1.0f, 1.0f, 1.0f, RED);
+                ctx.DrawWorld();
+                DrawCube(Vector3{ctx.camera.camera.target.x, ctx.camera.target_destination.y, ctx.camera.camera.target.z}, 1.0f, 1.0f, 1.0f, RED);
             }
             EndMode3D();
         }

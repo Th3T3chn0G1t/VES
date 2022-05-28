@@ -6,6 +6,16 @@ namespace VES {
             Vector3 translation = {0.0f, 0.0f, 0.0f};
             Vector3 rotation = {0.0f, 0.0f, 0.0f};
             Vector3 scale = {1.0f, 1.0f, 1.0f};
+
+            operator Matrix() {
+                Matrix ret = MatrixIdentity();
+                ret = MatrixMultiply(ret, MatrixTranslate(translation.x, translation.y, translation.z));
+                ret = MatrixMultiply(ret, MatrixRotate(Vector3{1.0f, 0.0f, 0.0f}, rotation.x));
+                ret = MatrixMultiply(ret, MatrixRotate(Vector3{0.0f, 1.0f, 0.0f}, rotation.y));
+                ret = MatrixMultiply(ret, MatrixRotate(Vector3{0.0f, 0.0f, 1.0f}, rotation.z));
+                ret = MatrixMultiply(ret, MatrixScale(scale.x, scale.y, scale.z));
+                return ret;
+            }
         };
 
         struct Renderable {
@@ -49,6 +59,10 @@ namespace VES {
             BoundingBox bounds;
 
             Blockable(Model& model) : bounds(GetModelBoundingBox(model)) {};
+        };
+
+        struct Selectable {
+            char pad;
         };
     }
 }
