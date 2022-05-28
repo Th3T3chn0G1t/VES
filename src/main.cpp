@@ -89,15 +89,16 @@ int main(int argc, const char** argv) {
             world.emplace<VES::Component::Renderable>(c, &teapot, BLUE);
             world.emplace<VES::Component::SurfaceObject>(c);
             world.emplace<VES::Component::LuaBehavior>(c);
+            world.emplace<VES::Component::Blockable>(c, teapot);
 
             entt::entity d = world.create();
             ctx.scene["d"] = d;
             world.emplace<VES::Component::Name>(d, "d");
-            world.emplace<VES::Component::Transform>(d, Vector3{20.0f, 0.0f, 20.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{5.0f, 5.0f, 5.0f});
+            world.emplace<VES::Component::Transform>(d, Vector3{20.0f, 10.0f, 20.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{5.0f, 5.0f, 5.0f});
             world.emplace<VES::Component::Renderable>(d, &teapot, YELLOW);
             world.emplace<VES::Component::SurfaceObject>(d);
             world.emplace<VES::Component::LuaBehavior>(d);
-            world.emplace<VES::Component::UnboundedVerticalBlock>(d);
+            world.emplace<VES::Component::UnboundedVerticalBlock>(d, teapot);
         }
     }
 

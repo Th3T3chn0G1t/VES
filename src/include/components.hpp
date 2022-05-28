@@ -40,7 +40,15 @@ namespace VES {
         };
 
         struct UnboundedVerticalBlock {
-            char pad;
+            BoundingBox bounds;
+
+            UnboundedVerticalBlock(Model& model) : bounds(GetModelBoundingBox(model)) {};
+        };
+
+        struct Blockable {
+            BoundingBox bounds;
+
+            Blockable(Model& model) : bounds(GetModelBoundingBox(model)) {};
         };
     }
 }
