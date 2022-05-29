@@ -69,6 +69,7 @@ void Context::Update(float delta) {
         });
     }
 
+    std::fill(map->grid.begin(), map->grid.end(), VES::Cell{});
     world.view<Component::Transform, Component::UnboundedVerticalBlock>().each([this](entt::entity entity, Component::Transform& transform, Component::UnboundedVerticalBlock& block) {
         BoundingBox bounds = block.bounds;
 

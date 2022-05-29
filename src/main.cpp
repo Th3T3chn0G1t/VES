@@ -69,6 +69,7 @@ int main(int argc, const char** argv) {
             world.emplace<VES::Component::Renderable>(a, &teapot, RED);
             world.emplace<VES::Component::SurfaceObject>(a);
             world.emplace<VES::Component::LuaBehavior>(a);
+            world.emplace<VES::Component::UnboundedVerticalBlock>(a, teapot);
             world.emplace<VES::Component::Blockable>(a, teapot);
             world.emplace<VES::Component::Selectable>(a);
 
