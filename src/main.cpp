@@ -36,7 +36,6 @@ int main(int argc, const char** argv) {
     auto& world = ctx.world;
     VES::Map map;
     ctx.map = &map;
-    Model teapot = LoadModel(fmt::format("{}/model/teapot.obj", ctx.datafod.string()).c_str());
     {
         Image terrain_image = LoadImage(fmt::format("{}/texture/heightmap.png", ctx.datafod.string()).c_str());
         Texture2D terrain_texture = LoadTextureFromImage(terrain_image);
