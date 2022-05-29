@@ -31,13 +31,6 @@ namespace VES {
             Image heightmap;
         };
 
-        struct Behavior {
-            using Functor = std::function<void(Context&, entt::entity, float)>;
-            using CallbackMap = std::unordered_map<std::string, Functor>;
-
-            CallbackMap callbacks;
-        };
-
         struct LuaBehavior {
             using Functor = sol::protected_function;
             using CallbackMap = std::unordered_map<std::string, Functor>;

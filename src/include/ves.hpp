@@ -16,11 +16,23 @@
 #include <algorithm>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <cmath>
 
+#include "components.hpp"
+
 namespace VES {
+    struct Cell {
+        std::optional<entt::entity> occupier;
+    };
+
     struct Map {
+        Component::Transform* terrain_transform;
+        BoundingBox terrain_bounds;
         entt::entity terrain;
+        std::vector<Cell> grid;
+        std::size_t width = 0;
+        std::size_t height = 0;
     };
 
     struct Camera {
@@ -65,5 +77,3 @@ namespace VES {
         void RegisterLuaNatives();
     };
 }
-
-#include "components.hpp"

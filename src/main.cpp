@@ -27,30 +27,40 @@ int main(int argc, const char** argv) {
     InitWindow(ctx.screen_dim.x, ctx.screen_dim.y, "VES");
     SetTargetFPS(60);
     SetCameraMode(ctx.camera.camera, CAMERA_CUSTOM);
-    Image terrain_image = LoadImage(fmt::format("{}/texture/heightmap.png", ctx.datafod.string()).c_str());
-    Texture2D terrain_texture = LoadTextureFromImage(terrain_image);
-    Mesh terrain_mesh = GenMeshHeightmap(terrain_image, Vector3{1.0f, 1.0f, 1.0f});
-    Model terrain_model = LoadModelFromMesh(terrain_mesh);
-    terrain_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = terrain_texture;
 
-    ctx.lua.open_libraries(sol::lib::base, sol::lib::package);
+    ctx.lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math, sol::lib::os);
     ctx.lua.set_exception_handler(lua_exception_handler);
     ctx.RegisterLuaNatives();
     sol::load_result main_script = ctx.lua.load_file(fmt::format("{}/script/test.lua", ctx.datafod.string()));
 
     auto& world = ctx.world;
+    VES::Map map;
+    ctx.map = &map;
+    Model teapot = LoadModel(fmt::format("{}/model/teapot.obj", ctx.datafod.string()).c_str());
     {
-        entt::entity terrain = world.create();
-        ctx.scene["terrain"] = terrain;
-        world.emplace<VES::Component::Name>(terrain, "terrain");
-        world.emplace<VES::Component::Transform>(terrain, Vector3{-50.0f, 0.0f, -50.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{100.0f, 20.0f, 100.0f});
-        world.emplace<VES::Component::Terrain>(terrain, terrain_image);
-        world.emplace<VES::Component::Renderable>(terrain, &terrain_model);
-        world.emplace<VES::Component::LuaBehavior>(terrain);
-        VES::Map map{terrain};
-        ctx.map = &map;
+        Image terrain_image = LoadImage(fmt::format("{}/texture/heightmap.png", ctx.datafod.string()).c_str());
+        Texture2D terrain_texture = LoadTextureFromImage(terrain_image);
+        Mesh terrain_mesh = GenMeshHeightmap(terrain_image, Vector3{1.0f, 1.0f, 1.0f});
+        Model terrain_model = LoadModelFromMesh(terrain_mesh);
+        terrain_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = terrain_texture;
+        ctx.map->terrain_bounds = GetModelBoundingBox(terrain_model);
 
-        Model teapot = LoadModel(fmt::format("{}/model/teapot.obj", ctx.datafod.string()).c_str());
+        ctx.map->terrain = world.create();
+        ctx.scene["terrain"] = ctx.map->terrain;
+
+        world.emplace<VES::Component::Name>(ctx.map->terrain, "terrain");
+        VES::Component::Transform transform = {Vector3{-50.0f, 0.0f, -50.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{100.0f, 20.0f, 100.0f}};
+        world.emplace<VES::Component::Transform>(ctx.map->terrain, transform);
+        ctx.map->terrain_transform = &world.get<VES::Component::Transform>(ctx.map->terrain);
+        world.emplace<VES::Component::Terrain>(ctx.map->terrain, terrain_image);
+        world.emplace<VES::Component::Renderable>(ctx.map->terrain, &terrain_model);
+        world.emplace<VES::Component::LuaBehavior>(ctx.map->terrain);
+
+        ctx.map->width = static_cast<std::size_t>((ctx.map->terrain_bounds.max.x - ctx.map->terrain_bounds.min.x) * transform.scale.x);
+        ctx.map->height = static_cast<std::size_t>((ctx.map->terrain_bounds.max.z - ctx.map->terrain_bounds.min.z) * transform.scale.z);
+        ctx.map->grid.resize(ctx.map->width * ctx.map->height);
+        std::fill(ctx.map->grid.begin(), ctx.map->grid.end(), VES::Cell{});
+
         {
             entt::entity a = world.create();
             ctx.scene["a"] = a;
@@ -58,13 +68,6 @@ int main(int argc, const char** argv) {
             world.emplace<VES::Component::Transform>(a, Vector3{10.0f, 0.0f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
             world.emplace<VES::Component::Renderable>(a, &teapot, RED);
             world.emplace<VES::Component::SurfaceObject>(a);
-            world.emplace<VES::Component::Behavior>(a,
-                VES::Component::Behavior::CallbackMap{
-                    {"update", [](VES::Context& ctx, entt::entity entity, float delta) {
-                         VES::Component::Transform& transform = ctx.world.get<VES::Component::Transform>(entity);
-                         transform.translation.x += (GetRandomValue(0, 255) / 255.0f) - 0.5f;
-                         transform.translation.z += (GetRandomValue(0, 255) / 255.0f) - 0.5f;
-                     }}});
             world.emplace<VES::Component::LuaBehavior>(a);
             world.emplace<VES::Component::Blockable>(a, teapot);
             world.emplace<VES::Component::Selectable>(a);
@@ -75,13 +78,6 @@ int main(int argc, const char** argv) {
             world.emplace<VES::Component::Transform>(b, Vector3{-10.0f, 0.0f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
             world.emplace<VES::Component::Renderable>(b, &teapot, GREEN);
             world.emplace<VES::Component::SurfaceObject>(b);
-            world.emplace<VES::Component::Behavior>(b,
-                VES::Component::Behavior::CallbackMap{
-                    {"update", [](VES::Context& ctx, entt::entity entity, float delta) {
-                         VES::Component::Transform& transform = ctx.world.get<VES::Component::Transform>(entity);
-                         transform.translation.x += (ctx.camera.camera.target.x - transform.translation.x) * 0.1f * delta;
-                         transform.translation.z += (ctx.camera.camera.target.z - transform.translation.z) * 0.1f * delta;
-                     }}});
             world.emplace<VES::Component::LuaBehavior>(b);
             world.emplace<VES::Component::Blockable>(b, teapot);
             world.emplace<VES::Component::Selectable>(b);
@@ -99,7 +95,8 @@ int main(int argc, const char** argv) {
             entt::entity d = world.create();
             ctx.scene["d"] = d;
             world.emplace<VES::Component::Name>(d, "d");
-            world.emplace<VES::Component::Transform>(d, Vector3{20.0f, 10.0f, 20.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{5.0f, 5.0f, 5.0f});
+            VES::Component::Transform transform{Vector3{20.0f, 10.0f, 20.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{5.0f, 5.0f, 5.0f}};
+            world.emplace<VES::Component::Transform>(d, transform);
             world.emplace<VES::Component::Renderable>(d, &teapot, YELLOW);
             world.emplace<VES::Component::SurfaceObject>(d);
             world.emplace<VES::Component::LuaBehavior>(d);
@@ -108,7 +105,6 @@ int main(int argc, const char** argv) {
             world.emplace<VES::Component::Selectable>(d);
         }
     }
-
     main_script.call();
 
     while (!WindowShouldClose()) {
@@ -123,6 +119,17 @@ int main(int argc, const char** argv) {
                 if (ctx.camera.focus) {
                     float height = ctx.HeightAtPlanarWorldPos(Vector2{ctx.camera.focus->x, ctx.camera.focus->y});
                     DrawCircle3D(Vector3{ctx.camera.focus->x, height + ctx.camera.focus->y, ctx.camera.focus->z}, 2.5f, Vector3{1.0f, 0.0f, 0.0f}, 90.0f, RED);
+                }
+
+                for (std::size_t i = 0; i < ctx.map->grid.size(); ++i) {
+                    if (ctx.map->grid[i].occupier.has_value()) {
+                        DrawCube(
+                            Vector3{
+                                ctx.map->terrain_transform->translation.x + static_cast<float>(i % static_cast<size_t>(((ctx.map->terrain_bounds.max.x - ctx.map->terrain_bounds.min.x) * ctx.map->terrain_transform->scale.x))),
+                                20.0f,
+                                ctx.map->terrain_transform->translation.z + static_cast<float>(i / static_cast<size_t>(((ctx.map->terrain_bounds.max.x - ctx.map->terrain_bounds.min.x) * ctx.map->terrain_transform->scale.x)))},
+                            1.0f, 1.0f, 1.0f, RED);
+                    }
                 }
             }
             EndMode3D();
