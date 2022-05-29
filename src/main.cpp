@@ -61,49 +61,63 @@ int main(int argc, const char** argv) {
         ctx.map->grid.resize(ctx.map->width * ctx.map->height);
         std::fill(ctx.map->grid.begin(), ctx.map->grid.end(), VES::Cell{});
 
-        {
-            entt::entity a = world.create();
-            ctx.scene["a"] = a;
-            world.emplace<VES::Component::Name>(a, "a");
-            world.emplace<VES::Component::Transform>(a, Vector3{10.0f, 0.0f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
-            world.emplace<VES::Component::Renderable>(a, &teapot, RED);
-            world.emplace<VES::Component::SurfaceObject>(a);
-            world.emplace<VES::Component::LuaBehavior>(a);
-            world.emplace<VES::Component::UnboundedVerticalBlock>(a, teapot);
-            world.emplace<VES::Component::Blockable>(a, teapot);
-            world.emplace<VES::Component::Selectable>(a);
+        YAML::Node map = YAML::LoadFile(fmt::format("{}/map/0.yaml", ctx.datafod.string()).c_str());
+        for (const auto& object : map) {
+            for (auto i = object.begin(); i != object.end(); ++i) {
+                const auto& name = i->first.as<std::string>();
+                ctx.scene[name] = ctx.world.create();
+                world.emplace<VES::Component::Name>(ctx.scene[name], name);
+                world.emplace<VES::Component::SurfaceObject>(ctx.scene[name]);
+                world.emplace<VES::Component::LuaBehavior>(ctx.scene[name]);
+                world.emplace<VES::Component::Selectable>(ctx.scene[name]);
 
-            entt::entity b = world.create();
-            ctx.scene["b"] = b;
-            world.emplace<VES::Component::Name>(b, "b");
-            world.emplace<VES::Component::Transform>(b, Vector3{-10.0f, 0.0f, 0.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
-            world.emplace<VES::Component::Renderable>(b, &teapot, GREEN);
-            world.emplace<VES::Component::SurfaceObject>(b);
-            world.emplace<VES::Component::LuaBehavior>(b);
-            world.emplace<VES::Component::Blockable>(b, teapot);
-            world.emplace<VES::Component::Selectable>(b);
+                for (const auto& attribute : i->second) {
+                    for (auto j = attribute.begin(); j != attribute.end(); ++j) {
+                        if (std::string_view(j->first.as<std::string>()) == "transform") {
+                            VES::Component::Transform transform;
+                            for (const auto& aspect : j->second) {
+                                for (auto k = aspect.begin(); k != aspect.end(); ++k) {
+                                    const auto& vec = k->second.as<std::vector<float>>();
+                                    if (std::string_view(k->first.as<std::string>()) == "translation") {
+                                        transform.translation = Vector3{vec[0], vec[1], vec[2]};
+                                    } else if (std::string_view(k->first.as<std::string>()) == "rotation") {
+                                        transform.rotation = Vector3{vec[0], vec[1], vec[2]};
+                                    } else if (std::string_view(k->first.as<std::string>()) == "scale") {
+                                        transform.scale = Vector3{vec[0], vec[1], vec[2]};
+                                    } else {
+                                        fmt::print("Invalid transform component `{}`\n", k->first.as<std::string>());
+                                        exit(1);
+                                    }
+                                }
+                            }
+                            world.emplace<VES::Component::Transform>(ctx.scene[name], transform);
+                        } else if (std::string_view(j->first.as<std::string>()) == "renderable") {
+                            VES::Component::Renderable renderable;
+                            for (const auto& aspect : j->second) {
+                                for (auto k = aspect.begin(); k != aspect.end(); ++k) {
+                                    if (std::string_view(k->first.as<std::string>()) == "model") {
+                                        Model& model = ctx.model_registry.GetOrLoad(fmt::format("{}/{}", ctx.datafod.string(), k->second.as<std::string>()));
 
-            entt::entity c = world.create();
-            ctx.scene["c"] = c;
-            world.emplace<VES::Component::Name>(c, "c");
-            world.emplace<VES::Component::Transform>(c, Vector3{0.0f, 0.0f, 10.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{0.5f, 0.5f, 0.5f});
-            world.emplace<VES::Component::Renderable>(c, &teapot, BLUE);
-            world.emplace<VES::Component::SurfaceObject>(c);
-            world.emplace<VES::Component::LuaBehavior>(c);
-            world.emplace<VES::Component::Blockable>(c, teapot);
-            world.emplace<VES::Component::Selectable>(c);
-
-            entt::entity d = world.create();
-            ctx.scene["d"] = d;
-            world.emplace<VES::Component::Name>(d, "d");
-            VES::Component::Transform transform{Vector3{20.0f, 10.0f, 20.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{5.0f, 5.0f, 5.0f}};
-            world.emplace<VES::Component::Transform>(d, transform);
-            world.emplace<VES::Component::Renderable>(d, &teapot, YELLOW);
-            world.emplace<VES::Component::SurfaceObject>(d);
-            world.emplace<VES::Component::LuaBehavior>(d);
-            world.emplace<VES::Component::UnboundedVerticalBlock>(d, teapot);
-            world.emplace<VES::Component::Blockable>(d, teapot);
-            world.emplace<VES::Component::Selectable>(d);
+                                        renderable.model = &model;
+                                        world.emplace<VES::Component::UnboundedVerticalBlock>(ctx.scene[name], model);
+                                        world.emplace<VES::Component::Blockable>(ctx.scene[name], model);
+                                    } else if (std::string_view(k->first.as<std::string>()) == "tint") {
+                                        const auto& vec = k->second.as<std::vector<unsigned char>>();
+                                        renderable.tint = Color{vec[0], vec[1], vec[2], 255};
+                                    } else {
+                                        fmt::print("Invalid transform component `{}`\n", k->first.as<std::string>());
+                                        exit(1);
+                                    }
+                                }
+                            }
+                            world.emplace<VES::Component::Renderable>(ctx.scene[name], renderable);
+                        } else {
+                            fmt::print("Unknown serialized component type `{}`", j->first.as<std::string>());
+                            exit(1);
+                        }
+                    }
+                }
+            }
         }
     }
     main_script.call();

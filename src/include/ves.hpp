@@ -11,12 +11,16 @@
 
 #include <sol/sol.hpp>
 
+#include <yaml-cpp/yaml.h>
+
 #include <unordered_map>
 #include <filesystem>
 #include <algorithm>
 #include <functional>
 #include <memory>
 #include <optional>
+#include <string>
+#include <string_view>
 #include <cmath>
 
 #include "components.hpp"
@@ -33,6 +37,28 @@ namespace VES {
         std::vector<Cell> grid;
         std::size_t width = 0;
         std::size_t height = 0;
+    };
+
+    template<typename T>
+    struct AssetRegistry {
+        std::unordered_map<std::filesystem::path, T> registry;
+
+        virtual T Load(std::filesystem::path path) = 0;
+        T& GetOrLoad(std::filesystem::path path) {
+            auto it = registry.find(path);
+            if (it == registry.end()) {
+                return registry[path] = Load(path);
+            } else {
+                return it->second;
+            }
+        }
+    };
+
+    struct ModelRegistry : AssetRegistry<Model> {
+        Model Load(std::filesystem::path path) {
+            fmt::print("Loading model {}\n", path.string());
+            return LoadModel(path.c_str());
+        }
     };
 
     struct Camera {
@@ -66,6 +92,8 @@ namespace VES {
         Map* map;
         entt::registry world;
         std::unordered_map<std::string, entt::entity> scene;
+
+        ModelRegistry model_registry;
 
         sol::state lua;
 

@@ -24,12 +24,21 @@ namespace VES {
         });
 
         ves_namespace.set_function("get_entity", [this](std::string name) {
-            return scene[name];
+            auto it = scene.find(name);
+            if (it == scene.end()) {
+                fmt::print("No such entity `{}`\n", name);
+                exit(1);
+            }
+            return it->second;
         });
 
         ves_namespace.set_function("register", [this](std::string signal, sol::protected_function f, std::string name) {
-            entt::entity entity = scene[name];
-            Component::LuaBehavior& behavior = world.get<Component::LuaBehavior>(entity);
+            auto it = scene.find(name);
+            if (it == scene.end()) {
+                fmt::print("No such entity `{}`\n", name);
+                exit(1);
+            }
+            Component::LuaBehavior& behavior = world.get<Component::LuaBehavior>(it->second);
             behavior.callbacks[signal] = f;
         });
     }
