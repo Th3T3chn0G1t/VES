@@ -84,6 +84,12 @@ namespace VES {
         std::string* focused_name = NULL;
     };
 
+    struct Dialog {
+        bool shown = false;
+        std::string text = "unnamed";
+        float current_character = 0;
+    };
+
     struct Context {
         std::filesystem::path datafod = "res";
         Vector2 screen_dim = {1280, 720};
@@ -97,7 +103,10 @@ namespace VES {
 
         sol::state lua;
 
-        void Update(float delta);
+        Dialog dialog;
+        std::size_t ui_text_scale = 20;
+
+        void Update(float delta, bool mouse_blocked);
         void UpdateCamera(float delta);
         void Dispatch(std::string signal, float delta);
         void DrawWorld();

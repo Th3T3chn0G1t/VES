@@ -33,6 +33,8 @@ int main(int argc, const char** argv) {
     ctx.RegisterLuaNatives();
     sol::load_result main_script = ctx.lua.load_file(fmt::format("{}/script/test.lua", ctx.datafod.string()));
 
+    Texture2D dialog_texture = LoadTexture(fmt::format("{}/texture/dialog_bg.png", ctx.datafod.string()).c_str());
+
     auto& world = ctx.world;
     VES::Map map;
     ctx.map = &map;
@@ -48,7 +50,7 @@ int main(int argc, const char** argv) {
         ctx.scene["terrain"] = ctx.map->terrain;
 
         world.emplace<VES::Component::Name>(ctx.map->terrain, "terrain");
-        VES::Component::Transform transform = {Vector3{-50.0f, 0.0f, -50.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{100.0f, 20.0f, 100.0f}};
+        VES::Component::Transform transform = {Vector3{-250.0f, -10.0f, -250.0f}, Vector3{0.0f, 0.0f, 0.0f}, Vector3{500.0f, 20.0f, 500.0f}};
         world.emplace<VES::Component::Transform>(ctx.map->terrain, transform);
         ctx.map->terrain_transform = &world.get<VES::Component::Transform>(ctx.map->terrain);
         world.emplace<VES::Component::Terrain>(ctx.map->terrain, terrain_image);
@@ -119,10 +121,28 @@ int main(int argc, const char** argv) {
             }
         }
     }
+
     main_script.call();
 
+    ctx.dialog.shown = true;
+    ctx.dialog.text = "Why hello, welcome to VES! This is a test of whether text wrapping works properly! Hmmm, does that look right to you? If not, it is raylib's fault - blame it on the tools not the artist always ;^). Who doesn't love meme-y game libs that don't have neccesary features for making games *ahem* *ahem*.";
+
     while (!WindowShouldClose()) {
-        ctx.Update(GetFrameTime());
+        bool mouse_blocked = false;
+        float dialog_width = ctx.screen_dim.x * 0.75f;
+        float dialog_height = ctx.screen_dim.y * 0.3f;
+        float dialog_x = (ctx.screen_dim.x / 2.0f) - (dialog_width / 2.0f);
+        float dialog_y = ctx.screen_dim.y - (dialog_height * 1.1f);
+        if (ctx.dialog.shown && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            Vector2 pos = GetMousePosition();
+            if (pos.x > dialog_x && pos.x < dialog_x + dialog_width) {
+                if (pos.y > dialog_y && pos.y < dialog_y + dialog_height) {
+                    mouse_blocked = true;
+                    ctx.dialog.shown = false;
+                }
+            }
+        }
+        ctx.Update(GetFrameTime(), mouse_blocked);
         BeginDrawing();
         {
             ClearBackground(BLACK);
@@ -147,7 +167,39 @@ int main(int argc, const char** argv) {
                 }
             }
             EndMode3D();
-            DrawText(fmt::format("Selected: {}", ctx.camera.focused_name ? *ctx.camera.focused_name : "unnamed").c_str(), 10, 10, 20, RAYWHITE);
+            DrawText(fmt::format("Selected: {}", ctx.camera.focused_name ? *ctx.camera.focused_name : "unnamed").c_str(), 10, 10, ctx.ui_text_scale, RAYWHITE);
+
+            if (ctx.dialog.shown) {
+                DrawTextureQuad(dialog_texture, Vector2{1.0f, 1.0f}, Vector2{0, 0}, Rectangle{dialog_x, dialog_y, dialog_width, dialog_height}, WHITE);
+
+                float y = dialog_y + dialog_height * 0.1f;
+
+                std::size_t last_line_end = 0;
+                std::size_t current_char_whole = 0;
+                while (current_char_whole < static_cast<std::size_t>(ctx.dialog.current_character)) {
+                    float width = 0.0f;
+                    std::string substr = "unnamed";
+                    while (width < dialog_width * 0.9f) {
+                        substr = ctx.dialog.text.substr(last_line_end, current_char_whole - last_line_end);
+
+                        width = MeasureText(substr.c_str(), ctx.ui_text_scale);
+
+                        if (++current_char_whole >= static_cast<std::size_t>(ctx.dialog.current_character)) {
+                            // current_char_whole--;
+                            break;
+                        }
+                    }
+                    substr = ctx.dialog.text.substr(last_line_end, current_char_whole - last_line_end);
+                    fmt::print("{} - {} -> {}\n", last_line_end, current_char_whole, ctx.dialog.text.substr(last_line_end, current_char_whole - last_line_end));
+                    DrawText(substr.c_str(), dialog_x + dialog_height * 0.1f, y, ctx.ui_text_scale, BLACK);
+                    last_line_end = current_char_whole;
+
+                    y += ctx.ui_text_scale;
+                }
+                if (ctx.dialog.current_character < ctx.dialog.text.size()) {
+                    ctx.dialog.current_character += 0.25f;
+                }
+            }
         }
         EndDrawing();
     }

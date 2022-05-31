@@ -40,10 +40,10 @@ void Context::DrawWorld() {
     });
 }
 
-void Context::Update(float delta) {
+void Context::Update(float delta, bool mouse_blocked) {
     UpdateCamera(delta);
 
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    if (!mouse_blocked && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         world.view<Component::Transform, Component::Blockable, Component::Selectable, Component::LuaBehavior, Component::Name>().each([this, delta](entt::entity entity, Component::Transform& transform, Component::Blockable& blockable, Component::Selectable selectable, Component::LuaBehavior& behavior, Component::Name& name) {
             float height = HeightAtPlanarWorldPos(Vector2{transform.translation.x, transform.translation.y});
             BoundingBox real_bounds = BoundingBox{
@@ -75,7 +75,10 @@ void Context::Update(float delta) {
 
         for (size_t i = 0; i < static_cast<size_t>((bounds.max.z - bounds.min.z) * transform.scale.z); ++i) {
             for (size_t j = 0; j < static_cast<size_t>((bounds.max.x - bounds.min.x) * transform.scale.x); ++j) {
-                map->grid[static_cast<size_t>(transform.translation.x + (bounds.min.x * transform.scale.x) - (map->terrain_transform->translation.x - 1)) + j + (static_cast<size_t>(transform.translation.z + (bounds.min.z * transform.scale.z) - (map->terrain_transform->translation.z - 1)) + i) * map->width].occupier.emplace(entity);
+                size_t index = static_cast<size_t>(transform.translation.x + (bounds.min.x * transform.scale.x) - (map->terrain_transform->translation.x - 1)) + j + (static_cast<size_t>(transform.translation.z + (bounds.min.z * transform.scale.z) - (map->terrain_transform->translation.z - 1)) + i) * map->width;
+                if (index < map->width * map->height) {
+                    map->grid[index].occupier.emplace(entity);
+                }
             }
         }
     });
