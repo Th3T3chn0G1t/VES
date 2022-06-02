@@ -41,13 +41,13 @@ namespace VES {
 
     template<typename T>
     struct AssetRegistry {
-        std::unordered_map<std::filesystem::path, T> registry;
+        std::unordered_map<std::string, T> registry;
 
         virtual T Load(std::filesystem::path path) = 0;
         T& GetOrLoad(std::filesystem::path path) {
-            auto it = registry.find(path);
+            auto it = registry.find(path.string());
             if (it == registry.end()) {
-                return registry[path] = Load(path);
+                return registry[path.string()] = Load(path.string());
             } else {
                 return it->second;
             }

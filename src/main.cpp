@@ -103,8 +103,8 @@ int main(int argc, const char** argv) {
                                         world.emplace<VES::Component::UnboundedVerticalBlock>(ctx.scene[name], model);
                                         world.emplace<VES::Component::Blockable>(ctx.scene[name], model);
                                     } else if (std::string_view(k->first.as<std::string>()) == "tint") {
-                                        const auto& vec = k->second.as<std::vector<unsigned char>>();
-                                        renderable.tint = Color{vec[0], vec[1], vec[2], 255};
+                                        const auto& vec = k->second.as<std::vector<int>>();
+                                        renderable.tint = Color{static_cast<unsigned char>(vec[0]), static_cast<unsigned char>(vec[1]), static_cast<unsigned char>(vec[2]), 255};
                                     } else {
                                         fmt::print("Invalid transform component `{}`\n", k->first.as<std::string>());
                                         exit(1);
@@ -190,7 +190,6 @@ int main(int argc, const char** argv) {
                         }
                     }
                     substr = ctx.dialog.text.substr(last_line_end, current_char_whole - last_line_end);
-                    fmt::print("{} - {} -> {}\n", last_line_end, current_char_whole, ctx.dialog.text.substr(last_line_end, current_char_whole - last_line_end));
                     DrawText(substr.c_str(), dialog_x + dialog_height * 0.1f, y, ctx.ui_text_scale, BLACK);
                     last_line_end = current_char_whole;
 
