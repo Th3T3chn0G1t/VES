@@ -1,4 +1,4 @@
-CXX ?= clang++
+CXX = clang++
 
 SOURCES = $(wildcard src/*.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)
