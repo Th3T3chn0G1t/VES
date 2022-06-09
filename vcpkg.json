@@ -10,6 +10,7 @@
     "entt",
     "sol2",
     "luajit",
-    "imgui"
+    "imgui",
+    "yaml-cpp"
   ]
 }

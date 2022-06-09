@@ -39,7 +39,7 @@ namespace VES {
         std::size_t height = 0;
     };
 
-    template<typename T>
+    template <typename T>
     struct AssetRegistry {
         std::unordered_map<std::string, T> registry;
 
@@ -57,7 +57,7 @@ namespace VES {
     struct ModelRegistry : AssetRegistry<Model> {
         Model Load(std::filesystem::path path) {
             fmt::print("Loading model {}\n", path.string());
-            return LoadModel(path.c_str());
+            return LoadModel(path.string().c_str());
         }
     };
 
