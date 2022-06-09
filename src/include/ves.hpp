@@ -88,6 +88,7 @@ namespace VES {
         bool shown = false;
         std::string text = "unnamed";
         float current_character = 0;
+        static constexpr float speed = 0.5f;
     };
 
     struct Context {

@@ -185,7 +185,6 @@ int main(int argc, const char** argv) {
                         width = MeasureText(substr.c_str(), ctx.ui_text_scale);
 
                         if (++current_char_whole >= static_cast<std::size_t>(ctx.dialog.current_character)) {
-                            // current_char_whole--;
                             break;
                         }
                     }
@@ -196,7 +195,7 @@ int main(int argc, const char** argv) {
                     y += ctx.ui_text_scale;
                 }
                 if (ctx.dialog.current_character < ctx.dialog.text.size()) {
-                    ctx.dialog.current_character += 0.25f;
+                    ctx.dialog.current_character += VES::Dialog::speed;
                 }
             }
         }
