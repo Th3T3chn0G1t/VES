@@ -11,7 +11,7 @@ add_subdirectory(deps)
 
 project(VES)
 
-file(GLOB_RECURSE SRC_FILES vendor/*.cpp vendor/*.hpp vendor/*.c vendor/*.h src/*.cpp src/*.hpp src/*.c src/*.h)
+file(GLOB_RECURSE SRC_FILES src/*.cpp src/*.hpp src/*.c src/*.h)
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 set(raylib_USE_STATIC_LIBS ON)

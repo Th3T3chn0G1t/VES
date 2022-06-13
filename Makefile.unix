@@ -6,7 +6,7 @@ HEADERS = $(wildcard src/include/*.hpp)
 
 EXEC = VES.out
 
-DEPENDENCIES = lua raylib sol2 fmt yaml-cpp
+DEPENDENCIES = luajit raylib sol2 fmt yaml-cpp
 CFLAGS = $(shell pkg-config --cflags $(DEPENDENCIES))
 LFLAGS = $(shell pkg-config --libs $(DEPENDENCIES))
 
