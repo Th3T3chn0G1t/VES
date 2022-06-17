@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 
 include(vcpkg.cmake)
-add_subdirectory(deps)
 
 project(VES)
 
@@ -25,6 +24,11 @@ find_package(yaml-cpp CONFIG REQUIRED)
 find_path(LUAJIT_INCLUDE_DIR luajit.h PATH_SUFFIXES luajit luajit-2.0 luajit-2.1)
 find_library(LUAJIT_LIBRARY NAMES lua51 luajit-5.1)
 
+set(BGFX_INSTALL OFF)
+set(BGFX_BUILD_EXAMPLES OFF)
+set(BGFX_CUSTOM_TARGETS OFF)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/bgfx-git)
+
 target_link_libraries(${PROJECT_NAME} yaml-cpp fmt::fmt asio::asio imgui::imgui EnTT::EnTT sol2::sol2 raylib bgfx bx bimg ${LUAJIT_LIBRARY})
 target_compile_definitions(${PROJECT_NAME} PRIVATE _USE_MATH_DEFINES SOL_LUAJIT SOL_ALL_SAFETIES_ON)
 
@@ -34,3 +38,6 @@ if (WIN32)
 endif ()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src ${LUAJIT_INCLUDE_DIR})
+
+add_compile_options(${PROJECT_NAME} -fsanitize=undefined,address)
+add_link_options(${PROJECT_NAME} -fsanitize=undefined,address)
