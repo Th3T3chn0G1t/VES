@@ -3,9 +3,9 @@
 namespace VES {
     namespace Component {
         struct Transform {
-            Vector3 translation = {0.0f, 0.0f, 0.0f};
-            Vector3 rotation = {0.0f, 0.0f, 0.0f};
-            Vector3 scale = {1.0f, 1.0f, 1.0f};
+            Vec3 translation = {0.0f, 0.0f, 0.0f};
+            Vec3 rotation = {0.0f, 0.0f, 0.0f};
+            Vec3 scale = {1.0f, 1.0f, 1.0f};
 
             operator Matrix() {
                 Matrix ret = MatrixIdentity();

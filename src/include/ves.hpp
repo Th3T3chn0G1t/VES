@@ -13,6 +13,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include <glm/glm.hpp>
+
 #include <unordered_map>
 #include <filesystem>
 #include <algorithm>
@@ -23,6 +25,13 @@
 #include <string_view>
 #include <cmath>
 
+namespace VES {
+	using Vec2 = Vector2;
+	using Vec3 = Vector3;
+	using Bounds = BoundingBox;
+	using Model = Model;
+}
+
 #include "components.hpp"
 
 namespace VES {
@@ -32,7 +41,7 @@ namespace VES {
 
     struct Map {
         Component::Transform* terrain_transform;
-        BoundingBox terrain_bounds;
+        Bounds terrain_bounds;
         entt::entity terrain;
         std::vector<Cell> grid;
         std::size_t width = 0;
@@ -62,25 +71,25 @@ namespace VES {
     };
 
     struct Camera {
-        Vector3 rotation = {0.0f, M_PI_2, 0.0f};
-        Vector3 forward = {0.0f, 0.0f, 0.0f};
-        Vector3 left = {0.0f, 0.0f, 0.0f};
-        Vector3 position = {0.0f, 0.0f, 0.0f};
+        Vec3 rotation = {0.0f, M_PI_2, 0.0f};
+        Vec3 forward = {0.0f, 0.0f, 0.0f};
+        Vec3 left = {0.0f, 0.0f, 0.0f};
+        Vec3 position = {0.0f, 0.0f, 0.0f};
         float zoom = 40.0f;
-        Vector3 target_destination = {0.0f, 0.0f, 0.0f};
-        Vector3 position_destination = {0.0f, 0.0f, 0.0f};
+        Vec3 target_destination = {0.0f, 0.0f, 0.0f};
+        Vec3 position_destination = {0.0f, 0.0f, 0.0f};
         Camera3D camera = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 45.0f, CAMERA_PERSPECTIVE};
 
         float move_speed = 20.0f;
         float zoom_speed = 10.0f;
         float turn_speed = 5.0f;
         float min_height = 5.0f;
-        Vector3 target_destination_interp_speed = {0.0f, 0.1f, 0.0f};
-        Vector3 position_destination_interp_speed = {0.0f, 0.5f, 0.0f};
+        Vec3 target_destination_interp_speed = {0.0f, 0.1f, 0.0f};
+        Vec3 position_destination_interp_speed = {0.0f, 0.5f, 0.0f};
 
-        Vector2 zoom_limits = {1.0f, 100.0f};
+        Vec2 zoom_limits = {1.0f, 100.0f};
 
-        Vector3* focus = NULL;
+        Vec3* focus = NULL;
         std::string* focused_name = NULL;
     };
 
@@ -88,15 +97,24 @@ namespace VES {
         bool shown = false;
         std::string text = "unnamed";
         float current_character = 0;
+
         static constexpr float speed = 0.5f;
+		static Texture2D dialog_texture;
     };
 
     struct Context {
-        std::filesystem::path datafod = "res";
-        Vector2 screen_dim = {1280, 720};
+		struct Config {
+			std::filesystem::path datafod = "res";
+			Vec2 dim = {640, 480};
+
+			std::filesystem::path initial_map;
+		};
+		
+        std::filesystem::path datafod;
+        Vec2 screen_dim;
 
         Camera camera;
-        Map* map;
+        std::unique_ptr<Map> map;
         entt::registry world;
         std::unordered_map<std::string, entt::entity> scene;
 
@@ -104,14 +122,25 @@ namespace VES {
 
         sol::state lua;
 
+		bool mouse_blocked = false;
         Dialog dialog;
+       	float dialog_width;
+        float dialog_height;
+        float dialog_x;
+        float dialog_y;
         std::size_t ui_text_scale = 20;
 
-        void Update(float delta, bool mouse_blocked);
+		Context(const Config& config);
+
+		void ShowDialog(const std::string& text);
+		std::vector<sol::load_result> LoadMap(const std::filesystem::path& path);
+        void Update(float delta);
         void UpdateCamera(float delta);
         void Dispatch(std::string signal, float delta);
+		void UpdateUI();
+		void DrawUI();
         void DrawWorld();
-        float HeightAtPlanarWorldPos(Vector2 planar_world);
+        float HeightAtPlanarWorldPos(Vec2 planar_world);
         void RegisterLuaNatives();
     };
 }

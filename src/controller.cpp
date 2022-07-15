@@ -11,11 +11,11 @@ static void limit(float& val, float dest, float diff) {
 }
 
 void Context::UpdateCamera(float delta) {
-    camera.target_destination.y = HeightAtPlanarWorldPos(Vector2{camera.camera.target.x, camera.camera.target.z});
+    camera.target_destination.y = HeightAtPlanarWorldPos(Vec2{camera.camera.target.x, camera.camera.target.z});
 
-    Vector3& rot = camera.rotation;
+    Vec3& rot = camera.rotation;
 
-    camera.forward = Vector3{static_cast<float>(std::sin(rot.x)), static_cast<float>(std::sin(rot.y)), static_cast<float>(std::sin(M_PI_2 - rot.x))};
+    camera.forward = Vec3{static_cast<float>(std::sin(rot.x)), static_cast<float>(std::sin(rot.y)), static_cast<float>(std::sin(M_PI_2 - rot.x))};
     if (IsKeyDown(KEY_Q) && camera.zoom - camera.zoom_speed * delta < camera.zoom_limits.y) {
         camera.zoom += camera.zoom_speed * delta;
     } else if (IsKeyDown(KEY_E) && camera.zoom + camera.zoom_speed * delta > camera.zoom_limits.x) {
@@ -40,9 +40,9 @@ void Context::UpdateCamera(float delta) {
 
     camera.left = Vector3CrossProduct(camera.camera.up, camera.forward);
 
-    Vector2 planar_vec_to_cam = Vector2{std::sin(rot.x), std::cos(rot.x)};
-    Vector2 planar_left = Vector2{std::sin(static_cast<float>(rot.x + M_PI_2)), std::cos(static_cast<float>(rot.x + M_PI_2))};
-    Vector3 &target = camera.camera.target, &target_dest = camera.target_destination, &target_interpspeed = camera.target_destination_interp_speed;
+    Vec2 planar_vec_to_cam = Vec2{std::sin(rot.x), std::cos(rot.x)};
+    Vec2 planar_left = Vector2{std::sin(static_cast<float>(rot.x + M_PI_2)), std::cos(static_cast<float>(rot.x + M_PI_2))};
+    Vec3 &target = camera.camera.target, &target_dest = camera.target_destination, &target_interpspeed = camera.target_destination_interp_speed;
 
     if (IsKeyDown(KEY_W)) {
         target.x -= planar_vec_to_cam.x * camera.move_speed * delta;

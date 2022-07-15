@@ -40,7 +40,7 @@ void Context::DrawWorld() {
     });
 }
 
-void Context::Update(float delta, bool mouse_blocked) {
+void Context::Update(float delta) {
     UpdateCamera(delta);
 
     if (!mouse_blocked && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {

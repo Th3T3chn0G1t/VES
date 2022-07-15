@@ -32,6 +32,15 @@ namespace VES {
             return it->second;
         });
 
+        ves_namespace.set_function("get_entity_pos_planar", [this](entt::entity entity) {
+            Component::Transform& transform = world.get<Component::Transform>(entity);
+            return lua.create_table_with("x", transform.translation.x, "y", transform.translation.z);
+        });
+
+        ves_namespace.set_function("get_cursor_pos_planar", [this]() {
+            return lua.create_table_with("x", camera.camera.target.x, "y", camera.camera.target.z);
+        });
+
         ves_namespace.set_function("register", [this](std::string signal, sol::protected_function f, std::string name) {
             auto it = scene.find(name);
             if (it == scene.end()) {

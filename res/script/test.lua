@@ -8,13 +8,42 @@ function red_teapot_update(entity, delta)
     ves.planar_move(entity, amt)
 end
 
+function follow_cursor(entity, delta)
+	cursor_pos = ves.get_cursor_pos_planar()
+	entity_pos = ves.get_entity_pos_planar(entity)
+
+	speed = 5.0
+
+	if(cursor_pos.x > entity_pos.x) then
+		dx = speed
+	else
+		dx = -speed
+	end
+
+	if(cursor_pos.y > entity_pos.y) then
+		dy = speed
+	else
+		dy = -speed
+	end
+	
+	amt = {x = dx * delta, y = dy * delta}
+    ves.planar_move(entity, amt)
+end
+
 function select(entity, delta)
-    print("Ayyy! " .. delta)
+	cursor_pos = ves.get_cursor_pos_planar()
+	entity_pos = ves.get_entity_pos_planar(entity)
+    print("Entity - x:" .. entity_pos.x .. " y:" .. entity_pos.y)
+	print("Cursor - x:" .. cursor_pos.x .. " y:" .. cursor_pos.y)
 end
 
 math.randomseed(os.time())
 
 ves.register("update", update, "c")
 ves.register("update", red_teapot_update, "a")
+ves.register("update", follow_cursor, "b")
 
 ves.register("select", select, "a")
+ves.register("select", select, "b")
+ves.register("select", select, "c")
+ves.register("select", select, "d")
