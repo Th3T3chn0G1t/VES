@@ -3,24 +3,15 @@
 namespace VES {
     namespace Component {
         struct Transform {
-            Vec3 translation = {0.0f, 0.0f, 0.0f};
-            Vec3 rotation = {0.0f, 0.0f, 0.0f};
-            Vec3 scale = {1.0f, 1.0f, 1.0f};
+            glm::vec3 translation = {0.0f, 0.0f, 0.0f};
+            glm::vec3 rotation = {0.0f, 0.0f, 0.0f};
+            glm::vec3 scale = {1.0f, 1.0f, 1.0f};
 
-            operator Matrix() {
-                Matrix ret = MatrixIdentity();
-                ret = MatrixMultiply(ret, MatrixTranslate(translation.x, translation.y, translation.z));
-                ret = MatrixMultiply(ret, MatrixRotate(Vector3{1.0f, 0.0f, 0.0f}, rotation.x));
-                ret = MatrixMultiply(ret, MatrixRotate(Vector3{0.0f, 1.0f, 0.0f}, rotation.y));
-                ret = MatrixMultiply(ret, MatrixRotate(Vector3{0.0f, 0.0f, 1.0f}, rotation.z));
-                ret = MatrixMultiply(ret, MatrixScale(scale.x, scale.y, scale.z));
-                return ret;
-            }
+            operator glm::mat4();
         };
 
         struct Renderable {
             Model* model;
-            Color tint = WHITE;
         };
 
         struct SurfaceObject {
@@ -28,7 +19,7 @@ namespace VES {
         };
 
         struct Terrain {
-            Image heightmap;
+        	Texture heightmap;
         };
 
         struct LuaBehavior {
@@ -43,15 +34,15 @@ namespace VES {
         };
 
         struct UnboundedVerticalBlock {
-            BoundingBox bounds;
+            Bounds bounds;
 
-            UnboundedVerticalBlock(Model& model) : bounds(GetModelBoundingBox(model)) {};
+            UnboundedVerticalBlock(Model& model) : bounds(model.GetBounds()) {};
         };
 
         struct Blockable {
-            BoundingBox bounds;
+            Bounds bounds;
 
-            Blockable(Model& model) : bounds(GetModelBoundingBox(model)) {};
+            Blockable(Model& model) : bounds(model.GetBounds()) {};
         };
 
         struct Selectable {
