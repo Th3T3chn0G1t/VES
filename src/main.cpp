@@ -3,17 +3,13 @@
 // Note to self: do not mix anything raylib with winapi (-> no global asio headers either :(.)
 
 int main(int argc, const char** argv) {
-    VES::Context::Config config{};
-    config.name = "VES";
-    config.datafod = "res";
-    config.dim = {1280, 720};
-    config.initial_map = "map/0.yaml";
+    VES::Context::Config config("ves.yaml");
 
     if (argc > 1) {
         config.datafod = argv[1];
     } else {
         if (!std::filesystem::is_directory(config.datafod)) {
-            config.datafod = "../res";
+            config.datafod = std::filesystem::path("../") / config.datafod;
         }
     }
 

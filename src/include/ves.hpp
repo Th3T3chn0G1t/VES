@@ -161,6 +161,8 @@ namespace VES {
 			glm::ivec2 dim{640, 480};
 
 			std::filesystem::path initial_map;
+
+			Config(const std::filesystem::path& path);
 		};
 		
         std::filesystem::path datafod;

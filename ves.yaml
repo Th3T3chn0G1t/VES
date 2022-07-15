@@ -1,0 +1,4 @@
+- name: "VES"
+- resourcepath: "res"
+- windowextent: [1280, 720]
+- initialmap: "map/0.yaml"

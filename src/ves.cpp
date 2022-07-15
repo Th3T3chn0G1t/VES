@@ -1,6 +1,30 @@
 #include "include/ves.hpp"
 
 namespace VES {
+    Context::Config::Config(const std::filesystem::path& path) {
+        YAML::Node config = YAML::LoadFile(path.string().c_str());
+
+        for (const auto& object : config) {
+            for (auto pair = object.begin(); pair != object.end(); ++pair) {
+                const std::string& key = pair->first.as<std::string>();
+                if (key == "name") {
+                    name = pair->second.as<std::string>();
+                } else if (key == "resourcepath") {
+                    datafod = std::filesystem::path(pair->second.as<std::string>());
+                } else if (key == "windowextent") {
+                    const auto& window_extent = pair->second.as<std::vector<int>>();
+                    dim.x = window_extent[0];
+                    dim.y = window_extent[1];
+                } else if (key == "initialmap") {
+                    initial_map = std::filesystem::path(pair->second.as<std::string>());
+                } else {
+                    fmt::print("Unknown config field `{}`", pair->first.as<std::string>());
+                    exit(1);
+                }
+            }
+        }
+    }
+
     float Context::GetFrameDelta() {
         // TODO: Raylib
         return GetFrameTime();
