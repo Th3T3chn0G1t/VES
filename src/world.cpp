@@ -55,7 +55,7 @@ void Context::DrawWorld() {
 void Context::Update(float delta) {
     UpdateCamera(delta);
 
-    if (!mouse_blocked && GetButtonHeld(MOUSE_BUTTON_LEFT)) {
+    if (!mouse_blocked && GetButtonReleased(MOUSE_BUTTON_LEFT)) {
         world.view<Component::Transform, Component::Blockable, Component::Selectable, Component::LuaBehavior, Component::Name>().each([this, delta](entt::entity entity, Component::Transform& transform, Component::Blockable& blockable, Component::Selectable selectable, Component::LuaBehavior& behavior, Component::Name& name) {
             float height = HeightAtPlanarWorldPos({transform.translation.x, transform.translation.y});
             Bounds real_bounds{

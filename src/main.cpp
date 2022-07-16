@@ -34,9 +34,9 @@ int main(int argc, const char** argv) {
             for (std::size_t i = 0; i < ctx.map->grid.size(); ++i) {
                 if (ctx.map->grid[i].occupier.has_value()) {
                     ctx.DrawCube(
-                        {ctx.map->terrain_transform->translation.x + static_cast<float>(i % static_cast<size_t>(((ctx.map->terrain_bounds.max.x - ctx.map->terrain_bounds.min.x) * ctx.map->terrain_transform->scale.x))),
+                        {ctx.map->terrain_transform->translation.x + static_cast<float>(i % static_cast<std::size_t>(((ctx.map->terrain_bounds.max.x - ctx.map->terrain_bounds.min.x) * ctx.map->terrain_transform->scale.x))),
                             20.0f,
-                            ctx.map->terrain_transform->translation.z + static_cast<float>(i / static_cast<size_t>(((ctx.map->terrain_bounds.max.x - ctx.map->terrain_bounds.min.x) * ctx.map->terrain_transform->scale.x)))},
+                            ctx.map->terrain_transform->translation.z + static_cast<float>(i / static_cast<std::size_t>(((ctx.map->terrain_bounds.max.x - ctx.map->terrain_bounds.min.x) * ctx.map->terrain_transform->scale.x)))},
                         {1.0f, 1.0f, 1.0f},
                         {1.0f, 0.0f, 0.0f, 1.0f});
                 }

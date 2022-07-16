@@ -17,6 +17,8 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include <stlastar.h>
+
 #include <unordered_map>
 #include <filesystem>
 #include <algorithm>
@@ -218,6 +220,7 @@ namespace VES {
 
 		bool GetKeyHeld(const Key key);
 		bool GetButtonHeld(const Button button);
+		bool GetButtonReleased(const Button button);
 		glm::vec2 GetMousePosition();
 
 		bool CheckMousePick(const Bounds& bounds);

@@ -1,3 +1,4 @@
+
 #include "include/ves.hpp"
 
 namespace VES {
@@ -38,6 +39,11 @@ namespace VES {
     bool Context::GetButtonHeld(const Button button) {
         // TODO: Raylib
         return IsMouseButtonPressed(button);
+    }
+
+    bool Context::GetButtonReleased(const Button button) {
+        // TODO: Raylib
+        return IsMouseButtonReleased(button);
     }
 
     glm::vec2 Context::GetMousePosition() {
@@ -176,7 +182,7 @@ namespace VES {
     void Context::UpdateUI() {
         mouse_blocked = false;
 
-        if (dialog.shown && GetButtonHeld(MOUSE_BUTTON_LEFT)) {
+        if (dialog.shown && GetButtonReleased(MOUSE_BUTTON_LEFT)) {
             glm::vec2 pos = GetMousePosition();
             if (pos.x > dialog_x && pos.x < dialog_x + dialog_width) {
                 if (pos.y > dialog_y && pos.y < dialog_y + dialog_height) {
