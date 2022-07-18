@@ -23,6 +23,10 @@ namespace VES {
             }
         });
 
+        // TODO: pathfind
+        // https://github.com/justinhj/astar-algorithm-cpp/blob/master/cpp/findpath.cpp
+        // https://github.com/justinhj/astar-algorithm-cpp/blob/master/cpp/8puzzle.cpp
+
         ves_namespace.set_function("get_entity", [this](std::string name) {
             auto it = scene.find(name);
             if (it == scene.end()) {
