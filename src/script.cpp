@@ -52,7 +52,7 @@ namespace VES {
             // TODO: Pathfind interp w/ speed - this just snaps to next state.
             //       See `planar_move_toward` since atm. pathfinding has no temporal consistency.
             transform.translation = {newpos.x, transform.translation.y, newpos.y};
-            fmt::print("Got pathfind planar newpos - x: {} y(z): {}\n", newpos.x, newpos.y);
+            // fmt::print("Got pathfind planar newpos - x: {} y(z): {}\n", newpos.x, newpos.y);
 
             // This is a really annoying cleanup block but oh well.
             astarsearch.CancelSearch();
