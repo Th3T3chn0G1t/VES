@@ -80,6 +80,24 @@ namespace VES {
         std::vector<Cell> grid;
         std::size_t width = 0;
         std::size_t height = 0;
+
+        glm::ivec2 GetCellPosPlanar(const glm::vec2& pos);
+        glm::vec2 CellPosPlanarToWorld(const glm::ivec2& pos);
+    };
+
+    struct MapSolver {
+        using Search = AStarSearch<MapSolver>;
+
+        glm::ivec2 pos;
+
+		float GoalDistanceEstimate(MapSolver& goal);
+		bool IsGoal(MapSolver& goal);
+		bool GetSuccessors(MapSolver::Search* astarsearch, MapSolver* parent);
+		float GetCost(MapSolver& successor);
+        bool IsSameState(MapSolver& rhs);
+
+        MapSolver() = default;
+        MapSolver(const glm::ivec2& pos) : pos(pos) {};
     };
 
     template <typename T>
