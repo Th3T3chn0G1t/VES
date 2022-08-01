@@ -1,3 +1,6 @@
 [submodule "deps/bgfx-git"]
 	path = deps/bgfx-git
 	url = https://github.com/bkaradzic/bgfx.cmake
+[submodule "src/vendor/AStar-VES"]
+	path = src/vendor/AStar-VES
+	url = https://github.com/Th3T3chn0G1t/AStar-VES
