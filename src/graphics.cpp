@@ -38,7 +38,7 @@ namespace VES {
 
     Window::Window(const glm::ivec2& extent, const std::string& name) : extent(extent) {
         // TODO: Raylib
-        InitWindow(extent.x, extent.y, "VES");
+        InitWindow(extent.x, extent.y, name.c_str());
         SetTargetFPS(60);
     }
 

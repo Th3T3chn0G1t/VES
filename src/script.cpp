@@ -23,7 +23,7 @@ namespace VES {
             }
         });
 
-        // TODO: `planar_move_toward`
+        // TODO: `planar_move_toward` - does interp.
 
         ves_namespace.set_function("pathfind_planar", [this](entt::entity entity, sol::table destination, sol::table speed) {
             // TODO: Move out search init into `Navigable` component or equiv. to avoid reinitializing
@@ -40,6 +40,7 @@ namespace VES {
 
             MapSolver* state = astarsearch.GetSolutionStart();
             while (true) {
+                fmt::print("|> Pathfind state - x: {} y(z): {}\n", state->pos.x, state->pos.y);
                 MapSolver* newstate = astarsearch.GetSolutionNext();
                 if (newstate == NULL) {
                     break;
@@ -52,7 +53,7 @@ namespace VES {
             // TODO: Pathfind interp w/ speed - this just snaps to next state.
             //       See `planar_move_toward` since atm. pathfinding has no temporal consistency.
             transform.translation = {newpos.x, transform.translation.y, newpos.y};
-            // fmt::print("Got pathfind planar newpos - x: {} y(z): {}\n", newpos.x, newpos.y);
+            fmt::print("Got pathfind cellular planar newpos - x: {} y(z): {}\n", state->pos.x, state->pos.y);
 
             // This is a really annoying cleanup block but oh well.
             astarsearch.CancelSearch();

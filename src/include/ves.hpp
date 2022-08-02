@@ -28,6 +28,7 @@
 #include <string>
 #include <string_view>
 #include <cmath>
+#include <cassert>
 
 namespace VES {
 	struct Bounds {
@@ -83,21 +84,6 @@ namespace VES {
 
         glm::ivec2 GetCellPosPlanar(const glm::vec2& pos);
         glm::vec2 CellPosPlanarToWorld(const glm::ivec2& pos);
-    };
-
-    struct MapSolver {
-        using Search = AStarSearch<MapSolver>;
-
-        glm::ivec2 pos;
-
-		float GoalDistanceEstimate(MapSolver& goal);
-		bool IsGoal(MapSolver& goal);
-		bool GetSuccessors(MapSolver::Search* astarsearch, MapSolver* parent);
-		float GetCost(MapSolver& successor);
-        bool IsSameState(MapSolver& rhs);
-
-        MapSolver() = default;
-        MapSolver(const glm::ivec2& pos) : pos(pos) {};
     };
 
     template <typename T>
@@ -243,6 +229,22 @@ namespace VES {
 
 		bool CheckMousePick(const Bounds& bounds);
     };
-}
 
-// 
+    struct MapSolver {
+        using Search = AStarSearch<MapSolver>;
+
+        // TODO: Remove this as soon as possible this is horrible.
+        static Context* ctx;
+        glm::ivec2 pos;
+
+		float GoalDistanceEstimate(MapSolver& goal);
+		bool IsGoal(MapSolver& goal);
+		bool GetSuccessors(MapSolver::Search* astarsearch, MapSolver* parent);
+		float GetCost(MapSolver& successor);
+        bool IsSameState(MapSolver& rhs);
+
+        MapSolver() = default;
+        MapSolver(const glm::ivec2& pos) : pos(pos) {};
+    };
+
+}
