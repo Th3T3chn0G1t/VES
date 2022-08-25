@@ -2,7 +2,7 @@
 
 using namespace VES;
 
-static void limit(float& val, float dest, float diff) {
+static void Limit(float& val, float dest, float diff) {
     if (val < dest - diff) {
         val += diff;
     } else if (val > dest + diff) {
@@ -69,9 +69,9 @@ void Context::UpdateCamera(float delta) {
         camera.focused_name = NULL;
     }
 
-    limit(camera.camera.target.x, target_dest.x, target_interpspeed.x);
-    limit(camera.camera.target.y, target_dest.y, target_interpspeed.y);
-    limit(camera.camera.target.z, target_dest.z, target_interpspeed.z);
+    Limit(camera.camera.target.x, target_dest.x, target_interpspeed.x);
+    Limit(camera.camera.target.y, target_dest.y, target_interpspeed.y);
+    Limit(camera.camera.target.z, target_dest.z, target_interpspeed.z);
 
     if (camera.focus) {
         camera.camera.target = {
@@ -88,9 +88,9 @@ void Context::UpdateCamera(float delta) {
         std::max(y, HeightAtPlanarWorldPos({camera.camera.position.x, camera.camera.position.z})),
         camera.camera.target.z + (planar_vec_to_cam.y * camera.zoom)};
 
-    limit(camera.camera.position.x, pos_dest.x, pos_interpspeed.x);
-    limit(camera.camera.position.y, pos_dest.y, pos_interpspeed.y);
-    limit(camera.camera.position.z, pos_dest.z, pos_interpspeed.z);
+    Limit(camera.camera.position.x, pos_dest.x, pos_interpspeed.x);
+    Limit(camera.camera.position.y, pos_dest.y, pos_interpspeed.y);
+    Limit(camera.camera.position.z, pos_dest.z, pos_interpspeed.z);
 
     ::UpdateCamera(&camera.camera);
 }

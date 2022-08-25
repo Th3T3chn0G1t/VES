@@ -59,6 +59,9 @@ namespace VES {
     }
 
     Context::Context(const Context::Config& config) : window(config.dim, config.name) {
+        // TODO: Remove as soon as possible.
+        MapSolver::ctx = this;
+
         datafod = config.datafod;
 
         if (!std::filesystem::is_directory(datafod)) {

@@ -2,6 +2,20 @@
 
 using namespace VES;
 
+glm::ivec2 Map::GetCellPosPlanar(const glm::vec2& pos) {
+    return {
+        static_cast<int>(
+            pos.x - (terrain_transform->translation.x - 1)),
+        static_cast<int>(
+            pos.y - (terrain_transform->translation.z - 1))};
+}
+
+glm::vec2 Map::CellPosPlanarToWorld(const glm::ivec2& pos) {
+    return {
+        pos.x + (terrain_transform->translation.x - 1),
+        pos.y + (terrain_transform->translation.z - 1)};
+}
+
 float Context::HeightAtPlanarWorldPos(const glm::vec2& planar_world) {
     const Component::Transform terrain_transform = world.get<Component::Transform>(map->terrain);
     const Component::Terrain terrain = world.get<Component::Terrain>(map->terrain);
@@ -81,13 +95,15 @@ void Context::Update(float delta) {
         });
     }
 
+    // TODO: Rebuilding the pathfinding grid every tick is not good! Let's find a smarter way to do this.
     std::fill(map->grid.begin(), map->grid.end(), VES::Cell{});
     world.view<Component::Transform, Component::UnboundedVerticalBlock>().each([this](entt::entity entity, Component::Transform& transform, Component::UnboundedVerticalBlock& block) {
         Bounds bounds = block.bounds;
 
-        for (size_t i = 0; i < static_cast<size_t>((bounds.max.z - bounds.min.z) * transform.scale.z); ++i) {
-            for (size_t j = 0; j < static_cast<size_t>((bounds.max.x - bounds.min.x) * transform.scale.x); ++j) {
-                size_t index = static_cast<size_t>(transform.translation.x + (bounds.min.x * transform.scale.x) - (map->terrain_transform->translation.x - 1)) + j + (static_cast<size_t>(transform.translation.z + (bounds.min.z * transform.scale.z) - (map->terrain_transform->translation.z - 1)) + i) * map->width;
+        for (std::size_t i = 0; i < static_cast<std::size_t>((bounds.max.z - bounds.min.z) * transform.scale.z); ++i) {
+            for (std::size_t j = 0; j < static_cast<std::size_t>((bounds.max.x - bounds.min.x) * transform.scale.x); ++j) {
+                glm::ivec2 cell_pos = map->GetCellPosPlanar({transform.translation.x + (bounds.min.x * transform.scale.x) + j, transform.translation.z + (bounds.min.z * transform.scale.z) + i});
+                std::size_t index = cell_pos.x + cell_pos.y * map->width;
                 if (index < map->width * map->height) {
                     map->grid[index].occupier.emplace(entity);
                 }

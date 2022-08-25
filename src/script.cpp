@@ -23,9 +23,47 @@ namespace VES {
             }
         });
 
-        // TODO: pathfind
-        // https://github.com/justinhj/astar-algorithm-cpp/blob/master/cpp/findpath.cpp
-        // https://github.com/justinhj/astar-algorithm-cpp/blob/master/cpp/8puzzle.cpp
+        // TODO: `planar_move_toward` - does interp.
+
+        ves_namespace.set_function("pathfind_planar", [this](entt::entity entity, sol::table destination, sol::table speed) {
+            // TODO: Move out search init into `Navigable` component or equiv. to avoid reinitializing
+            //       search object for every step.
+            MapSolver::Search astarsearch;
+
+            Component::Transform& transform = world.get<Component::Transform>(entity);
+            MapSolver begin{map->GetCellPosPlanar({transform.translation.x, transform.translation.z})};
+            MapSolver end{map->GetCellPosPlanar({destination["x"], destination["y"]})};
+
+            astarsearch.SetStartAndGoalStates(begin, end);
+
+            bool done = astarsearch.SearchStep() == MapSolver::Search::SEARCH_STATE_SUCCEEDED;
+
+            MapSolver* state = astarsearch.GetSolutionStart();
+            while (true) {
+                fmt::print("|> Pathfind state - x: {} y(z): {}\n", state->pos.x, state->pos.y);
+                MapSolver* newstate = astarsearch.GetSolutionNext();
+                if (newstate == NULL) {
+                    break;
+                }
+                state = newstate;
+            }
+
+            const glm::vec2 newpos = map->CellPosPlanarToWorld(state->pos);
+
+            // TODO: Pathfind interp w/ speed - this just snaps to next state.
+            //       See `planar_move_toward` since atm. pathfinding has no temporal consistency.
+            transform.translation = {newpos.x, transform.translation.y, newpos.y};
+            fmt::print("Got pathfind cellular planar newpos - x: {} y(z): {}\n", state->pos.x, state->pos.y);
+
+            // This is a really annoying cleanup block but oh well.
+            astarsearch.CancelSearch();
+            astarsearch.SetStartAndGoalStates(begin, end); // Reset states to not early-exit for cleanup
+            astarsearch.SearchStep();
+            astarsearch.FreeSolutionNodes();
+            astarsearch.EnsureMemoryFreed();
+
+            return done;
+        });
 
         ves_namespace.set_function("get_entity", [this](std::string name) {
             auto it = scene.find(name);

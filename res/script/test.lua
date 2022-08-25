@@ -37,13 +37,24 @@ function select(entity, delta)
 	print("Cursor - x:" .. cursor_pos.x .. " y:" .. cursor_pos.y)
 end
 
+function pathfind_e(entity, delta)
+    speed = {x = 5.0 * delta, y = 5.0 * delta}
+	ves.pathfind_planar(entity, ves.get_cursor_pos_planar(), speed)
+end
+
 math.randomseed(os.time())
 
-ves.register("update", update, "c")
 ves.register("update", red_teapot_update, "a")
-ves.register("update", follow_cursor, "b")
-
 ves.register("select", select, "a")
+
+ves.register("update", follow_cursor, "b")
 ves.register("select", select, "b")
+
+ves.register("update", update, "c")
 ves.register("select", select, "c")
+
 ves.register("select", select, "d")
+
+ves.register("update", pathfind_e, "e")
+ves.register("select", select, "e")
+

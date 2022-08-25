@@ -6,9 +6,9 @@ HEADERS := $(wildcard src/include/*.hpp)
 
 EXEC := VES.out
 
-DEPENDENCIES += luajit raylib sol2 fmt yaml-cpp
-CXXFLAGS += $(shell pkg-config --cflags $(DEPENDENCIES)) -Isrc/vendor/include -Wno-unknown-warning-option
-LFLAGS += $(shell pkg-config --libs $(DEPENDENCIES))
+DEPENDENCIES = luajit raylib sol2 fmt yaml-cpp
+CXXFLAGS = $(shell pkg-config --cflags $(DEPENDENCIES)) -Isrc/vendor/AStar-VES/cpp -DUSE_FSA_MEMORY=0 -Wno-unknown-warning-option
+LFLAGS = $(shell pkg-config --libs $(DEPENDENCIES))
 
 run: $(EXEC)
 	./$<
